@@ -35,6 +35,8 @@ describe('JWT Authentication Middleware', () => {
 
   afterAll(async () => {
     await mongoose.connection.close();
+     // Force clean on start
+    await User.deleteMany();
   });
 
   describe('Protected Route Access', () => {
@@ -62,7 +64,21 @@ describe('JWT Authentication Middleware', () => {
       
       expect(response.statusCode).toBe(200);
       expect(response.body.user.email).toBe('test@example.com');
+       expect(response.body.user.role).toBe('admin'); // First user = admin
       expect(response.body.user).not.toHaveProperty('password');
+    });
+
+    it('should populate req.user with role information', async () => {
+      // This test verifies the middleware correctly populates req.user
+      const response = await request(app)
+        .get('/api/auth/profile')
+        .set('Authorization', `Bearer ${validToken}`);
+      
+      expect(response.statusCode).toBe(200);
+      expect(response.body.user).toHaveProperty('id');
+      expect(response.body.user).toHaveProperty('email');
+      expect(response.body.user).toHaveProperty('role');
+      expect(response.body.user.role).toBe('admin'); // First registered user
     });
   });
 });

@@ -14,6 +14,7 @@ const generateToken = (userId) => {
 const formatUserResponse = (user) => ({
   id: user._id,
   email: user.email,
+  role: user.role
 });
 
 // Helper function for password hashing
@@ -34,10 +35,16 @@ export const register = async(req , res) =>{
             return res.status(409).json({message: "Email Already Exists"});
         }
 
+        // Check if this is the first user (admin logic)
+        const userCount = await User.countDocuments();
+        const role = userCount === 0 ? 'admin' : 'customer';
+        
+
         const hashedPassword= await hashPassword(password);
         const newUser= new User({
             email,
             password: hashedPassword,
+            role,
         });
 
         const savedUser = await newUser.save();
