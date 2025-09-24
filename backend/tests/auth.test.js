@@ -61,4 +61,59 @@ describe('Auth Endpoints', () => {
     expect(response.statusCode).toBe(409);
     expect(response.body.message).toBe('Email Already Exists');
   });
+
+  describe('Login Tests', () => {
+    it('should login a user with valid credentials', async () => {
+      const userData = {
+        email: 'testuser@example.com',
+        password: 'password123',
+      };
+
+      // First, register the user
+      await request(app).post('/api/auth/register').send(userData);
+
+      // Then try to login
+      const response = await request(app)
+        .post('/api/auth/login')
+        .send(userData);
+
+      expect(response.statusCode).toBe(200);
+      expect(response.body).toHaveProperty('token');
+      expect(response.body.user.email).toBe('testuser@example.com');
+      expect(response.body.user).not.toHaveProperty('password');
+    });
+
+    it('should return 401 for invalid email', async () => {
+      const response = await request(app)
+        .post('/api/auth/login')
+        .send({
+          email: 'nonexistent@example.com',
+          password: 'password123',
+        });
+
+      expect(response.statusCode).toBe(401);
+      expect(response.body.message).toBe('Invalid credentials');
+    });
+
+    it('should return 401 for invalid password', async () => {
+      const userData = {
+        email: 'testuser@example.com',
+        password: 'password123',
+      };
+
+      // First, register the user
+      await request(app).post('/api/auth/register').send(userData);
+
+      // Then try to login with wrong password
+      const response = await request(app)
+        .post('/api/auth/login')
+        .send({
+          email: 'testuser@example.com',
+          password: 'wrongpassword',
+        });
+
+      expect(response.statusCode).toBe(401);
+      expect(response.body.message).toBe('Invalid credentials');
+    });
+  });
 });
