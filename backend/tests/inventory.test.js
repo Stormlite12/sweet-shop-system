@@ -101,7 +101,7 @@ describe('Sweet Inventory Management', () => {
         .send(purchaseData);
 
       expect(response.statusCode).toBe(400);
-      expect(response.body.message).toBe('Purchase quantity must be positive');
+      expect(response.body.message).toBe('Purchase quantity is required');
     });
 
     it('should reject purchase without quantity', async () => {

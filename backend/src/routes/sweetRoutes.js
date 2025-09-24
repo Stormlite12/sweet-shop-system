@@ -5,7 +5,9 @@ import {
   searchSweets,
   getSweetById,
   updateSweet,
-  deleteSweet
+  deleteSweet,
+  purchaseSweet,    // Add this
+  restockSweet      // Add this
 } from '../controllers/sweetController.js';
 import { authenticateToken } from '../middleware/auth.js';
 import { requireAdmin } from '../middleware/admin.js';
@@ -16,6 +18,10 @@ const router = express.Router();
 router.get('/', authenticateToken, getAllSweets);
 router.get('/search', authenticateToken, searchSweets);
 router.get('/:id', authenticateToken, getSweetById);
+
+// Inventory routes
+router.post('/:id/purchase', authenticateToken, purchaseSweet);           // Any user can purchase
+router.post('/:id/restock', authenticateToken, requireAdmin, restockSweet); // Admin only
 
 // Admin only routes
 router.post('/', authenticateToken, requireAdmin, createSweet);

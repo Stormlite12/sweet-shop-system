@@ -152,3 +152,109 @@ export const deleteSweet = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
+export const purchaseSweet = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { quantity } = req.body;
+
+    // Validate MongoDB ObjectId format
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: 'Invalid sweet ID' });
+    }
+
+    // Validate quantity
+    if (!quantity) {
+      return res.status(400).json({ message: 'Purchase quantity is required' });
+    }
+
+    if (quantity <= 0) {
+      return res.status(400).json({ message: 'Purchase quantity must be positive' });
+    }
+
+    // Find sweet
+    const sweet = await Sweet.findById(id);
+    if (!sweet) {
+      return res.status(404).json({ message: 'Sweet not found' });
+    }
+
+    // Check stock availability
+    if (sweet.quantity < quantity) {
+      return res.status(400).json({ 
+        message: 'Insufficient stock',
+        available: sweet.quantity,
+        requested: quantity
+      });
+    }
+
+    // Update quantity
+    sweet.quantity -= quantity;
+    await sweet.save();
+
+    // Calculate purchase details
+    const totalPrice = parseFloat((quantity * sweet.price).toFixed(2));
+
+    res.status(200).json({
+      message: 'Purchase successful',
+      sweet,
+      purchaseDetails: {
+        quantity,
+        totalPrice,
+        unitPrice: sweet.price
+      }
+    });
+
+  } catch (error) {
+    console.log('PURCHASE SWEET ERROR:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// POST /api/sweets/:id/restock - Restock sweet (increase quantity, admin only)
+export const restockSweet = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { quantity } = req.body;
+
+    // Validate MongoDB ObjectId format
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: 'Invalid sweet ID' });
+    }
+
+    // Validate quantity
+    if (!quantity) {
+      return res.status(400).json({ message: 'Restock quantity is required' });
+    }
+
+    if (quantity <= 0) {
+      return res.status(400).json({ message: 'Restock quantity must be positive' });
+    }
+
+    // Find sweet
+    const sweet = await Sweet.findById(id);
+    if (!sweet) {
+      return res.status(404).json({ message: 'Sweet not found' });
+    }
+
+    // Store previous quantity
+    const previousQuantity = sweet.quantity;
+
+    // Update quantity
+    sweet.quantity += quantity;
+    await sweet.save();
+
+    res.status(200).json({
+      message: 'Restock successful',
+      sweet,
+      restockDetails: {
+        quantity,
+        previousQuantity,
+        newQuantity: sweet.quantity
+      }
+    });
+
+  } catch (error) {
+    console.log('RESTOCK SWEET ERROR:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
