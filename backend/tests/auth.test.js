@@ -36,7 +36,16 @@ describe('Auth Endpoints', () => {
         password: 'password123'
       });
 
-      it('should return a 409 error if the email already exists', async () => {
+    
+
+    // Assert (check) that the response is what we expect
+    expect(response.statusCode).toBe(201); // 201 means 'Created'
+    expect(response.body).toHaveProperty('token'); // The response should have a JWT token
+    expect(response.body.user.email).toBe('testuser@example.com'); // The user's email should match
+    expect(response.body.user).not.toHaveProperty('password'); // The user's password should NOT be returned
+  });
+
+   it('should return a 409 error if the email already exists', async () => {
     const userData = {
       email: 'testuser@example.com',
       password: 'password123',
@@ -51,13 +60,5 @@ describe('Auth Endpoints', () => {
     // 3. Assert that it fails with a 409 Conflict error
     expect(response.statusCode).toBe(409);
     expect(response.body.message).toBe('Email Already Exists');
-  });
-
-
-    // Assert (check) that the response is what we expect
-    expect(response.statusCode).toBe(201); // 201 means 'Created'
-    expect(response.body).toHaveProperty('token'); // The response should have a JWT token
-    expect(response.body.user.email).toBe('testuser@example.com'); // The user's email should match
-    expect(response.body.user).not.toHaveProperty('password'); // The user's password should NOT be returned
   });
 });
