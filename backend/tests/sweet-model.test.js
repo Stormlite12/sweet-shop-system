@@ -1,46 +1,115 @@
-import request from 'supertest';
-import app from '../src/app.js';
 import mongoose from 'mongoose';
-import User from '../src/models/User.js';
 import Sweet from '../src/models/Sweet.js';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 describe('Sweet Model Validation', () => {
-  let adminToken;
+  beforeAll(async () => {
+    await mongoose.connect(process.env.MONGO_TEST_URI);
+  });
 
   beforeEach(async () => {
-    await User.deleteMany();
+    // Only clean Sweet collection - no User needed for model tests
     await Sweet.deleteMany();
-    
-    const adminResponse = await request(app)
-      .post('/api/auth/register')
-      .send({ email: 'admin@test.com', password: 'password123' });
-    adminToken = adminResponse.body.token;
   });
 
-  it('should create sweet with required fields: name, category, price, quantity', async () => {
-    const sweetData = {
-      name: 'Chocolate Cake',
-      category: 'cakes', 
-      price: 25.99,
-      quantity: 10
-    };
-
-    const response = await request(app)
-      .post('/api/sweets')
-      .set('Authorization', `Bearer ${adminToken}`)
-      .send(sweetData);
-
-    expect(response.statusCode).toBe(201);
-    expect(response.body.sweet).toHaveProperty('id');
-    expect(response.body.sweet.name).toBe('Chocolate Cake');
+  afterAll(async () => {
+    await Sweet.deleteMany();
+    await mongoose.connection.close();
   });
 
-  it('should reject sweet without required fields', async () => {
-    const response = await request(app)
-      .post('/api/sweets')
-      .set('Authorization', `Bearer ${adminToken}`)
-      .send({ name: 'Incomplete' });
+  describe('Required Fields Validation', () => {
+    it('should create sweet with all required fields', async () => {
+      const sweetData = {
+        name: 'Chocolate Cake',
+        category: 'cakes',
+        price: 25.99,
+        quantity: 10
+      };
 
-    expect(response.statusCode).toBe(400);
+      const sweet = new Sweet(sweetData);
+      const savedSweet = await sweet.save();
+
+      expect(savedSweet._id).toBeDefined();
+      expect(savedSweet.name).toBe('Chocolate Cake');
+      expect(savedSweet.category).toBe('cakes');
+      expect(savedSweet.price).toBe(25.99);
+      expect(savedSweet.quantity).toBe(10);
+    });
+
+    it('should reject sweet without name', async () => {
+      const sweetData = {
+        category: 'cakes',
+        price: 25.99,
+        quantity: 10
+      };
+
+      const sweet = new Sweet(sweetData);
+      
+      await expect(sweet.save()).rejects.toThrow('Sweet name is required');
+    });
+
+    it('should reject sweet without category', async () => {
+      const sweetData = {
+        name: 'Chocolate Cake',
+        price: 25.99,
+        quantity: 10
+      };
+
+      const sweet = new Sweet(sweetData);
+      
+      await expect(sweet.save()).rejects.toThrow('Category is required');
+    });
+
+    it('should reject sweet without price', async () => {
+      const sweetData = {
+        name: 'Chocolate Cake',
+        category: 'cakes',
+        quantity: 10
+      };
+
+      const sweet = new Sweet(sweetData);
+      
+      await expect(sweet.save()).rejects.toThrow('Price is required');
+    });
+
+    it('should reject sweet without quantity', async () => {
+      const sweetData = {
+        name: 'Chocolate Cake',
+        category: 'cakes',
+        price: 25.99
+      };
+
+      const sweet = new Sweet(sweetData);
+      
+      await expect(sweet.save()).rejects.toThrow('Quantity is required');
+    });
+
+    it('should reject negative price', async () => {
+      const sweetData = {
+        name: 'Chocolate Cake',
+        category: 'cakes',
+        price: -5.99,
+        quantity: 10
+      };
+
+      const sweet = new Sweet(sweetData);
+      
+      await expect(sweet.save()).rejects.toThrow('Price must be positive');
+    });
+
+    it('should reject negative quantity', async () => {
+      const sweetData = {
+        name: 'Chocolate Cake',
+        category: 'cakes',
+        price: 25.99,
+        quantity: -5
+      };
+
+      const sweet = new Sweet(sweetData);
+      
+      await expect(sweet.save()).rejects.toThrow('Quantity cannot be negative');
+    });
   });
 });
