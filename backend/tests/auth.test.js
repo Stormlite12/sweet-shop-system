@@ -36,6 +36,24 @@ describe('Auth Endpoints', () => {
         password: 'password123'
       });
 
+      it('should return a 409 error if the email already exists', async () => {
+    const userData = {
+      email: 'testuser@example.com',
+      password: 'password123',
+    };
+
+    // 1. Create the user for the first time
+    await request(app).post('/api/auth/register').send(userData);
+
+    // 2. Try to create the same user again
+    const response = await request(app).post('/api/auth/register').send(userData);
+
+    // 3. Assert that it fails with a 409 Conflict error
+    expect(response.statusCode).toBe(409);
+    expect(response.body.message).toBe('Email Already Exists');
+  });
+
+
     // Assert (check) that the response is what we expect
     expect(response.statusCode).toBe(201); // 201 means 'Created'
     expect(response.body).toHaveProperty('token'); // The response should have a JWT token
