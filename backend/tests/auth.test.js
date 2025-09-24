@@ -1,9 +1,32 @@
 // tests/auth.test.js
 import request from 'supertest';
-import app from "../src/app" 
+import app from "../src/app.js" 
+import mongoose from 'mongoose';
+import User from '../src/models/User.js';
+import dotenv from 'dotenv';
 
+dotenv.config();
+
+const MONGO_TEST_URI=process.env.MONGO_TEST_URI;
 //using jest 
 describe('Auth Endpoints', () => {
+
+  // Before all tests, connect to the database
+  beforeAll(async () => {
+    await mongoose.connect(MONGO_TEST_URI);
+  });
+
+  // After each test, clear the users collection
+  afterEach(async () => {
+    await User.deleteMany();
+  });
+
+  // After all tests are finished, close the connection
+  afterAll(async () => {
+    await mongoose.connection.close();
+  });
+
+
   it('should register a new user successfully', async () => {
     // Send a POST request to the registration endpoint with user data
     const response = await request(app)
