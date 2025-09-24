@@ -1,4 +1,3 @@
-
 import User from "../models/User.js";
 import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
@@ -9,6 +8,18 @@ dotenv.config();
 
 const generateToken = (userId) => {
   return jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: '7d' });
+};
+
+// Helper function to format user response (remove password)
+const formatUserResponse = (user) => ({
+  id: user._id,
+  email: user.email,
+});
+
+// Helper function for password hashing
+const hashPassword = async (password) => {
+  const salt = await bcrypt.genSalt(10);
+  return bcrypt.hash(password, salt);
 };
 
 
@@ -23,9 +34,7 @@ export const register = async(req , res) =>{
             return res.status(409).json({message: "Email Already Exists"});
         }
 
-        const salt= await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password,salt);
-
+        const hashedPassword= await hashPassword(password);
         const newUser= new User({
             email,
             password: hashedPassword,
@@ -37,10 +46,7 @@ export const register = async(req , res) =>{
 
         res.status(201).json({
             token,
-            user: {
-                id: savedUser._id,
-                email: savedUser.email,
-            },
+            user: formatUserResponse(savedUser),
         });
     }
     catch(error){
@@ -73,10 +79,7 @@ export const login = async (req, res) => {
 
         res.status(200).json({
             token,
-            user: {
-                id: user._id,
-                email: user.email,
-            }
+            user:formatUserResponse(user),
         });
 
     } catch (error) {
