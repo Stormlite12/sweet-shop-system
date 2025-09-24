@@ -87,3 +87,15 @@ export const login = async (req, res) => {
         res.status(500).json({ message: 'Server error' });
     }
 };
+
+export const getProfile = async(req, res) => {
+    try {
+        // req.user is populated by authenticateToken middleware
+        res.status(200).json({
+            user: formatUserResponse(req.user),
+        });
+    } catch (error) {
+        console.log('GET PROFILE ERROR', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
