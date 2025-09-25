@@ -1,3 +1,4 @@
+// backend/src/models/Sweet.js
 import mongoose from 'mongoose';
 
 const SweetSchema = new mongoose.Schema({
@@ -16,10 +17,18 @@ const SweetSchema = new mongoose.Schema({
     required: [true, 'Price is required'],
     min: [0, 'Price must be positive']
   },
-  quantity: {
+  stock: {  // Changed from 'quantity' to 'stock' to match frontend
     type: Number,
-    required: [true, 'Quantity is required'],
-    min: [0, 'Quantity cannot be negative'],
+    required: [true, 'Stock is required'],
+    min: [0, 'Stock cannot be negative']
+  },
+  image: {
+    type: String,
+    default: '/src/assets/placeholder.jpg' // Default placeholder image
+  },
+  isActive: {
+    type: Boolean,
+    default: true // To enable/disable sweets without deleting
   }
 }, {
   timestamps: true // Adds createdAt and updatedAt automatically

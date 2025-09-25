@@ -15,13 +15,14 @@ export const getAllSweets = async (req, res) => {
 // POST /api/sweets - Create new sweet (Admin only)
 export const createSweet = async (req, res) => {
   try {
-    const { name, category, price, quantity } = req.body;
+    const { name, category, price, stock, image } = req.body; // ✅ Added image
 
     const sweet = new Sweet({
       name,
       category,
       price,
-      quantity
+      stock,
+      image: image || '/src/assets/placeholder.jpg' // ✅ Default image
     });
 
     const savedSweet = await sweet.save();
@@ -153,10 +154,11 @@ export const deleteSweet = async (req, res) => {
   }
 };
 
+// POST /api/sweets/:id/purchase - Purchase sweet (reduce stock)
 export const purchaseSweet = async (req, res) => {
   try {
     const { id } = req.params;
-    const { quantity } = req.body;
+    const { quantity } = req.body; // ✅ Fixed: changed from 'stock' to 'quantity'
 
     // Validate MongoDB ObjectId format
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -179,20 +181,20 @@ export const purchaseSweet = async (req, res) => {
     }
 
     // Check stock availability
-    if (sweet.quantity < quantity) {
+    if (sweet.stock < quantity) { // ✅ Fixed: use 'quantity' consistently
       return res.status(400).json({ 
         message: 'Insufficient stock',
-        available: sweet.quantity,
+        available: sweet.stock,
         requested: quantity
       });
     }
 
-    // Update quantity
-    sweet.quantity -= quantity;
+    // Update stock
+    sweet.stock -= quantity; // ✅ Fixed: use 'quantity' consistently
     await sweet.save();
 
     // Calculate purchase details
-    const totalPrice = parseFloat((quantity * sweet.price).toFixed(2));
+    const totalPrice = parseFloat((quantity * sweet.price).toFixed(2)); // ✅ Fixed: use 'quantity'
 
     res.status(200).json({
       message: 'Purchase successful',
@@ -210,11 +212,11 @@ export const purchaseSweet = async (req, res) => {
   }
 };
 
-// POST /api/sweets/:id/restock - Restock sweet (increase quantity, admin only)
+// POST /api/sweets/:id/restock - Restock sweet (increase stock, admin only)
 export const restockSweet = async (req, res) => {
   try {
     const { id } = req.params;
-    const { quantity } = req.body;
+    const { quantity } = req.body; // ✅ Fixed: changed from 'stock' to 'quantity'
 
     // Validate MongoDB ObjectId format
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -236,11 +238,11 @@ export const restockSweet = async (req, res) => {
       return res.status(404).json({ message: 'Sweet not found' });
     }
 
-    // Store previous quantity
-    const previousQuantity = sweet.quantity;
+    // Store previous stock
+    const previousStock = sweet.stock; // ✅ Fixed: renamed for clarity
 
-    // Update quantity
-    sweet.quantity += quantity;
+    // Update stock
+    sweet.stock += quantity; // ✅ Fixed: use 'quantity' consistently
     await sweet.save();
 
     res.status(200).json({
@@ -248,8 +250,8 @@ export const restockSweet = async (req, res) => {
       sweet,
       restockDetails: {
         quantity,
-        previousQuantity,
-        newQuantity: sweet.quantity
+        previousStock, // ✅ Fixed: renamed for clarity
+        newStock: sweet.stock // ✅ Fixed: renamed for clarity
       }
     });
 
