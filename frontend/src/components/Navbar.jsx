@@ -1,7 +1,8 @@
-// src/components/Navbar.jsx - Add navigation links
+// src/components/Navbar.jsx
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { authService } from '../services/authService'
+import logo from "../assets/misthi-mahal-logo.png"
 import toast from 'react-hot-toast'
 
 export default function Navbar({ onOpenAuth }) {
@@ -9,7 +10,6 @@ export default function Navbar({ onOpenAuth }) {
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
 
-  // Check authentication status
   useEffect(() => {
     const checkAuth = () => {
       const currentUser = authService.getCurrentUser()
@@ -30,9 +30,9 @@ export default function Navbar({ onOpenAuth }) {
       authService.logout()
       setUser(null)
       toast.success('Logged out successfully! 👋')
-      navigate('/') // Redirect to home
+      navigate('/')
       window.dispatchEvent(new Event('authChange'))
-    } catch (error) {
+    } catch {  // error
       toast.error('Logout failed')
     } finally {
       setLoading(false)
@@ -40,61 +40,119 @@ export default function Navbar({ onOpenAuth }) {
   }
 
   return (
-    <div className="navbar bg-primary text-primary-content shadow-lg">
-      <div className="navbar-start">
-        <Link to="/" className="btn btn-ghost text-xl font-bold">
-          🍭 Sweet Shop
+    <header className="sticky top-0 z-50 w-full border-b border-orange-200/40 bg-gradient-to-r from-orange-50 via-amber-50 to-orange-50 backdrop-blur supports-[backdrop-filter]:bg-orange-50/95">
+      <div className="container mx-auto flex h-24 max-w-7xl items-center justify-between px-4">
+        
+        {/* Logo */}
+            <Link to="/" className="flex items-center space-x-2">
+          <div className="flex h-[125px] w-[100px] items-center justify-center rounded-md ">
+          <img 
+            src={logo} 
+            alt="Misthi Mahal Logo" 
+            className="h-full w-full object-contain" 
+          />
+        </div>
+        <span className="text-xl font-bold bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent">
+          Misthi Mahal
+        </span>
         </Link>
-      </div>
-      
-      <div className="navbar-center hidden lg:flex">
-        <ul className="menu menu-horizontal px-1">
-          <li><Link to="/" className="hover:bg-primary-focus">Home</Link></li>
+
+        {/* Navigation */}
+        <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
+          <Link 
+            to="/" 
+            className="transition-colors text-orange-600 "
+          >
+            Home
+          </Link>
           {user && authService.isAdmin() && (
-            <li><Link to="/admin" className="hover:bg-primary-focus">Admin Panel</Link></li>
+            <Link 
+              to="/admin" 
+              className="transition-colors text-orange-600 "
+            >
+              Admin Panel
+            </Link>
           )}
-        </ul>
-      </div>
-      
-      <div className="navbar-end space-x-2">
-        {user ? (
-          <div className="dropdown dropdown-end">
-            <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
-              <div className="w-10 rounded-full">
-                <img 
-                  alt="User avatar" 
-                  src="/src/assets/placeholder-user.jpg"
-                />
+        </nav>
+
+        {/* User Menu */}
+        <div className="flex items-center space-x-4">
+          
+  
+
+          {user ? (
+            <div className="flex items-center space-x-3">
+              {/* User Info */}
+              <div className="hidden sm:flex flex-col items-end">
+                <span className="text-sm font-medium text-orange-600">{user.name}</span>
+                <span className="text-xs text-muted-foreground text-orange-600">{user.email}</span>
+              </div>
+              
+              {/* Admin Badge */}
+              {authService.isAdmin() && (
+                <div className="px-2 py-1 text-xs font-medium bg-orange-100 text-orange-800 rounded-full border border-orange-200">
+                  Admin
+                </div>
+              )}
+              
+              {/* Avatar Dropdown */}
+              <div className="dropdown dropdown-end">
+                <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar hover:bg-orange-50">
+                  <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-orange-200">
+                    <img 
+                      alt="User avatar" 
+                      src="/src/assets/placeholder-user.jpg"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                </div>
+                
+                <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow-lg bg-white rounded-lg border border-border w-52 mt-2">
+                  <li className="px-3 py-2 border-b border-border">
+                    <div className="flex flex-col">
+                      <span className="font-medium text-foreground">{user.name}</span>
+                      <span className="text-sm text-muted-foreground">{user.email}</span>
+                      {authService.isAdmin() && (
+                        <span className="text-xs bg-orange-100 text-orange-800 px-2 py-1 rounded-full mt-1 w-fit">Admin</span>
+                      )}
+                    </div>
+                  </li>
+                  
+                  {authService.isAdmin() && (
+                    <li>
+                      <Link 
+                        to="/admin" 
+                        className="flex items-center px-3 py-2 text-sm hover:bg-orange-50 transition-colors"
+                      >
+                        <span className="mr-2">⚙️</span>
+                        Admin Panel
+                      </Link>
+                    </li>
+                  )}
+                  
+                  <li>
+                    <button 
+                      onClick={handleLogout}
+                      disabled={loading}
+                      className="flex items-center px-3 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors w-full text-left"
+                    >
+                      <span className="mr-2">🚪</span>
+                      {loading ? 'Logging out...' : 'Logout'}
+                    </button>
+                  </li>
+                </ul>
               </div>
             </div>
-            <ul tabIndex={0} className="menu menu-sm dropdown-content bg-base-100 text-base-content rounded-box z-[1] mt-3 w-52 p-2 shadow">
-              <li className="menu-title">
-                <span>{user.name}</span>
-                <span className="text-xs opacity-60">{user.email}</span>
-                {authService.isAdmin() && (
-                  <span className="badge badge-primary badge-sm">Admin</span>
-                )}
-              </li>
-              <li><Link to="/admin">Admin Panel</Link></li>
-              <li>
-                <button 
-                  onClick={handleLogout}
-                  disabled={loading}
-                >
-                  {loading ? 'Logging out...' : 'Logout'}
-                </button>
-              </li>
-            </ul>
-          </div>
-        ) : (
-          <button 
-            className="btn btn-secondary"
-            onClick={onOpenAuth}
-          >
-            Login
-          </button>
-        )}
+          ) : (
+            <button 
+              className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 bg-orange-600 text-white shadow hover:bg-orange-700 h-9 px-4 py-2"
+              onClick={onOpenAuth}
+            >
+              Sign In
+            </button>
+          )}
+        </div>
       </div>
-    </div>
+    </header>
   )
 }

@@ -34,48 +34,50 @@ export default function HeroSlider() {
   };
 
   return (
-    <section className="relative w-full h-[600px] overflow-hidden bg-gray-100 flex items-center justify-center">
-      <div className="relative w-full h-full max-w-6xl mx-auto overflow-hidden rounded-lg shadow-2xl">
+    <section className="relative w-full overflow-hidden flex items-center justify-center py-16 bg-gradient-to-b from-orange-50 to-white">
+      <div className="relative w-full h-[80vh] max-w-5xl mx-auto overflow-hidden rounded-lg shadow-2xl border border-orange-200/40">
         
         <ReactCompareSlider
           itemOne={
-            <ReactCompareSliderImage
-              src={currentSlide.before.src || "/api/placeholder/800/600"}
-              alt={currentSlide.before.alt}
-              style={{ objectFit: "cover" }}
-            />
-          }
-          itemTwo={
-            <ReactCompareSliderImage
-              src={currentSlide.after.src || "/api/placeholder/800/600"}
-              alt={currentSlide.after.alt}
-              style={{ objectFit: "cover" }}
-            />
-          }
+    <ReactCompareSliderImage
+      src={currentSlide.before.src || "/api/placeholder/800/600"}
+      alt={currentSlide.before.alt}
+      // Change this back to 'cover'
+      style={{ objectFit: "cover" }}
+    />
+  }
+  itemTwo={
+    <ReactCompareSliderImage
+      src={currentSlide.after.src || "/api/placeholder/800/600"}
+      alt={currentSlide.after.alt}
+      // Change this back to 'cover'
+      style={{ objectFit: "cover" }}
+    />
+  }
           position={sliderPosition}
           onPositionChange={setSliderPosition}
           className="w-full h-full"
           style={{
-            '--react-compare-slider-handle-color': '#ffffff',
-            '--react-compare-slider-handle-size': '40px',
+            '--react-compare-slider-handle-color': '#f97316',
+            '--react-compare-slider-handle-size': '12px',
           }}
           handle={
-            <div className="flex items-center justify-center w-10 h-10 bg-white rounded-full shadow-lg border-2 border-gray-300 cursor-grab active:cursor-grabbing">
-              <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="flex items-center justify-center w-12 h-12 bg-white rounded-full shadow-lg border-4 border-orange-200 cursor-grab active:cursor-grabbing hover:border-orange-300 transition-colors">
+              <svg className="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
               </svg>
             </div>
           }
           boundsPadding={0}
-          changePositionOnHover={false} // ✅ This is the key fix - set to false
+          changePositionOnHover={false}
         />
 
         {/* Text Overlay */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center z-30 p-8 text-white bg-black/30 pointer-events-none">
-          <h2 className="text-4xl md:text-6xl font-serif font-bold text-balance mb-4 text-center drop-shadow-lg">
+        <div className="absolute inset-0 flex flex-col items-center justify-center z-30 p-8 text-white bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none">
+          <h2 className="text-4xl md:text-6xl font-serif font-bold text-balance mb-4 text-center drop-shadow-2xl bg-gradient-to-r from-white via-orange-100 to-amber-100 bg-clip-text text-transparent">
             {currentSlide.title}
           </h2>
-          <p className="text-lg md:text-2xl font-sans text-pretty text-center max-w-2xl drop-shadow-md mb-8">
+          <p className="text-lg md:text-2xl font-sans text-pretty text-center max-w-2xl drop-shadow-lg mb-8">
             {currentSlide.description}
           </p>
         </div>
@@ -85,7 +87,7 @@ export default function HeroSlider() {
           <>
             <button
               onClick={prevSlide}
-              className="absolute left-4 top-4 z-40 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full p-3 transition-all duration-200 text-white hover:text-gray-200"
+              className="absolute left-4 top-1/2 transform -translate-y-1/2 z-40 bg-orange-100/80 hover:bg-orange-200/90 backdrop-blur-sm rounded-full p-3 transition-all duration-200 text-orange-700 hover:text-orange-800 border border-orange-200"
               aria-label="Previous slide"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -95,7 +97,7 @@ export default function HeroSlider() {
 
             <button
               onClick={nextSlide}
-              className="absolute right-4 top-4 z-40 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full p-3 transition-all duration-200 text-white hover:text-gray-200"
+              className="absolute right-4 top-1/2 transform -translate-y-1/2 z-40 bg-orange-100/80 hover:bg-orange-200/90 backdrop-blur-sm rounded-full p-3 transition-all duration-200 text-orange-700 hover:text-orange-800 border border-orange-200"
               aria-label="Next slide"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -111,10 +113,10 @@ export default function HeroSlider() {
                     setCurrentSlideIndex(index);
                     setSliderPosition(50);
                   }}
-                  className={`w-3 h-3 rounded-full transition-all duration-200 ${
+                  className={`w-4 h-4 rounded-full transition-all duration-200 border-2 ${
                     index === currentSlideIndex
-                      ? 'bg-white scale-125'
-                      : 'bg-white/50 hover:bg-white/75'
+                      ? 'bg-orange-500 border-orange-300 scale-125'
+                      : 'bg-orange-200/50 border-orange-300/50 hover:bg-orange-300/75 hover:border-orange-400'
                   }`}
                   aria-label={`Go to slide ${index + 1}`}
                 />
@@ -125,7 +127,7 @@ export default function HeroSlider() {
 
         <button
           onClick={() => setSliderPosition(50)}
-          className="absolute top-4 left-1/2 transform -translate-x-1/2 z-40 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full px-4 py-2 transition-all duration-200 text-white text-sm"
+          className="absolute top-4 left-1/2 transform -translate-x-1/2 z-40 bg-orange-100/80 hover:bg-orange-200/90 backdrop-blur-sm rounded-full px-4 py-2 transition-all duration-200 text-orange-700 text-sm border border-orange-200"
         >
           Reset to Center
         </button>

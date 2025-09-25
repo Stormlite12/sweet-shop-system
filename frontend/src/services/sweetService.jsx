@@ -45,10 +45,20 @@ export const sweetService = {
   // Delete sweet (Admin only)
   async deleteSweet(id) {
     try {
-      await api.delete(`/sweets/${id}`)
-      return { message: 'Sweet deleted successfully' }
+      const response = await api.delete(`/sweets/${id}`)
+      return response.data
     } catch (error) {
       throw new Error(error.response?.data?.message || 'Failed to delete sweet')
+    }
+  },
+
+  // Purchase sweet
+  async purchaseSweet(sweetId, purchaseData) {
+    try {
+      const response = await api.post(`/sweets/${sweetId}/purchase`, purchaseData)
+      return response.data
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Purchase failed')
     }
   }
 }

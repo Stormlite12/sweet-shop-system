@@ -2,14 +2,20 @@
 import { useState } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import Navbar from './components/Navbar'
-import Home from '../src/pages/Home'
+import Home from './pages/Home'
 import AdminPanel from './components/AdminPanel'
 import AuthModal from './components/AuthModal'
+import CartSidebar from './components/CartSidebar'
 import { Toaster } from 'react-hot-toast'
+import { useCart } from './hooks/useCart'
 import './App.css'
 
 function App() {
   const [showAuthModal, setShowAuthModal] = useState(false)
+  const [showCartSidebar, setShowCartSidebar] = useState(false)
+  
+  // Cart logic moved to custom hook
+  const cart = useCart()
 
   const handleAuthSuccess = () => {
     setShowAuthModal(false)
@@ -18,11 +24,23 @@ function App() {
 
   return (
     <Router>
-      <div className="min-h-screen" data-theme="sweetshop">
-        <Navbar onOpenAuth={() => setShowAuthModal(true)} />
+      <div className="min-h-screen bg-gradient-to-b from-orange-50 to-white" data-theme="sweetshop">
+        <Navbar 
+          onOpenAuth={() => setShowAuthModal(true)}
+          onOpenCart={() => setShowCartSidebar(true)}
+          cartItemsCount={cart.getTotalItems()}
+        />
         
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route 
+            path="/" 
+            element={
+              <Home 
+                cart={cart} 
+                onOpenCart={() => setShowCartSidebar(true)}
+              />
+            } 
+          />
           <Route path="/admin" element={<AdminPanel />} />
         </Routes>
 
@@ -30,6 +48,12 @@ function App() {
           isOpen={showAuthModal}
           onClose={() => setShowAuthModal(false)}
           onSuccess={handleAuthSuccess}
+        />
+
+        <CartSidebar
+          isOpen={showCartSidebar}
+          onClose={() => setShowCartSidebar(false)}
+          cart={cart}
         />
 
         <Toaster 
