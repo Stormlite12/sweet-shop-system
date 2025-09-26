@@ -36,7 +36,6 @@ function App() {
 
   return (
     <Router>
-      <Toaster position="top-center" reverseOrder={false} />
       
       {showCurtain && (
         <CurtainEffect onComplete={handleCurtainComplete}>
