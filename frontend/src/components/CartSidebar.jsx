@@ -130,10 +130,10 @@ export default function CartSidebar({ isOpen, onClose, cart }) {
         </div>
 
         {/* Content */}
-        <div className="flex flex-col h-full pb-safe">
+        <div className="flex flex-col h-full">
           
           {/* Cart Items */}
-          <div className="flex-1 overflow-y-auto p-6">
+          <div className="flex-1 overflow-y-auto p-6 pb-0">
             {loading ? (
               <div className="space-y-4">
                 {[...Array(3)].map((_, i) => (
@@ -253,7 +253,7 @@ export default function CartSidebar({ isOpen, onClose, cart }) {
 
           {/* Footer */}
           {sweets.length > 0 && (
-            <div className="border-t border-orange-100 p-6 bg-gradient-to-r from-orange-50 to-amber-50">
+            <div className="border-t border-orange-100 p-6 bg-gradient-to-r from-orange-50 to-amber-50 mt-auto">
               
               {/* Order Summary */}
               <div className="space-y-2 mb-4">
@@ -278,7 +278,7 @@ export default function CartSidebar({ isOpen, onClose, cart }) {
                 onClick={handlePurchase}
                 disabled={purchasing || sweets.length === 0}
                 onKeyDown={(e) => e.key === 'Enter' && handlePurchase()}
-                className="w-full bg-orange-600 hover:bg-orange-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2 focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
+                className="w-full bg-orange-600 hover:bg-orange-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2 focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 mb-2"
               >
                 {purchasing ? (
                   <>
@@ -298,7 +298,7 @@ export default function CartSidebar({ isOpen, onClose, cart }) {
                 )}
               </button>
 
-              <p className="text-xs text-gray-600 text-center mt-3">
+              <p className="text-xs text-gray-600 text-center mb-20">
                 🔒 Secure checkout • Stock updated in real-time
               </p>
             </div>

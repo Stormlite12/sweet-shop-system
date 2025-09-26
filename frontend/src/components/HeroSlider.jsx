@@ -73,64 +73,38 @@ export default function HeroSlider() {
         />
 
         {/* Text Overlay */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center z-30 p-8 text-white bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none">
-          <h2 className="text-4xl md:text-6xl font-serif font-bold text-balance mb-4 text-center drop-shadow-2xl bg-gradient-to-r from-white via-orange-100 to-amber-100 bg-clip-text text-transparent">
-            {currentSlide.title}
-          </h2>
-          <p className="text-lg md:text-2xl font-sans text-pretty text-center max-w-2xl drop-shadow-lg mb-8">
-            {currentSlide.description}
-          </p>
+        <div className="absolute inset-0 flex flex-col items-center justify-center z-30 p-8 pointer-events-none">
+          <div className="text-center bg-black/40 backdrop-blur-sm rounded-2xl p-8 max-w-4xl mx-auto border border-white/20">
+            <h2 className="text-4xl md:text-6xl font-serif font-bold mb-6 text-white drop-shadow-2xl">
+              {currentSlide.title}
+            </h2>
+            <p className="text-lg md:text-2xl font-sans text-white/90 max-w-2xl mx-auto drop-shadow-lg leading-relaxed">
+              {currentSlide.description}
+            </p>
+          </div>
         </div>
 
         {/* Slide Navigation */}
         {slides.length > 1 && (
-          <>
-            <button
-              onClick={prevSlide}
-              className="absolute left-4 top-1/2 transform -translate-y-1/2 z-40 bg-orange-100/80 hover:bg-orange-200/90 backdrop-blur-sm rounded-full p-3 transition-all duration-200 text-orange-700 hover:text-orange-800 border border-orange-200"
-              aria-label="Previous slide"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-
-            <button
-              onClick={nextSlide}
-              className="absolute right-4 top-1/2 transform -translate-y-1/2 z-40 bg-orange-100/80 hover:bg-orange-200/90 backdrop-blur-sm rounded-full p-3 transition-all duration-200 text-orange-700 hover:text-orange-800 border border-orange-200"
-              aria-label="Next slide"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
-
-            <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-40 flex space-x-3">
-              {slides.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => {
-                    setCurrentSlideIndex(index);
-                    setSliderPosition(50);
-                  }}
-                  className={`w-4 h-4 rounded-full transition-all duration-200 border-2 ${
-                    index === currentSlideIndex
-                      ? 'bg-orange-500 border-orange-300 scale-125'
-                      : 'bg-orange-200/50 border-orange-300/50 hover:bg-orange-300/75 hover:border-orange-400'
-                  }`}
-                  aria-label={`Go to slide ${index + 1}`}
-                />
-              ))}
-            </div>
-          </>
+          <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-40 flex space-x-3 bg-black/30 backdrop-blur-sm rounded-full px-4 py-2">
+            {slides.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => {
+                  setCurrentSlideIndex(index);
+                  setSliderPosition(50);
+                }}
+                className={`w-4 h-4 rounded-full transition-all duration-200 border-2 ${
+                  index === currentSlideIndex
+                    ? 'bg-orange-500 border-orange-300 scale-125'
+                    : 'bg-orange-200/50 border-orange-300/50 hover:bg-orange-300/75 hover:border-orange-400'
+                }`}
+                aria-label={`Go to slide ${index + 1}`}
+              />
+            ))}
+          </div>
         )}
 
-        <button
-          onClick={() => setSliderPosition(50)}
-          className="absolute top-4 left-1/2 transform -translate-x-1/2 z-40 bg-orange-100/80 hover:bg-orange-200/90 backdrop-blur-sm rounded-full px-4 py-2 transition-all duration-200 text-orange-700 text-sm border border-orange-200"
-        >
-          Reset to Center
-        </button>
       </div>
     </section>
   );

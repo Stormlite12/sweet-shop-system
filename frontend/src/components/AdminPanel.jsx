@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { sweetService } from '../services/sweetService'
 import { authService } from '../services/authService'
 import toast from 'react-hot-toast'
+import { API_ENDPOINTS } from '../config/api'
 
 export default function AdminPanel() {
   const [sweets, setSweets] = useState([])
@@ -13,10 +14,14 @@ export default function AdminPanel() {
   const [formData, setFormData] = useState({
     name: '',
     price: '',
-    image: '',
     stock: '',
-    category: ''
+    category: '',
+    image: ''
   })
+  
+  const [imageFile, setImageFile] = useState(null)
+  const [imagePreview, setImagePreview] = useState('')
+  const [imageInputType, setImageInputType] = useState('url') // 'url' or 'upload'
 
   // Check if user is admin
   const isAdmin = authService.isAdmin()
@@ -76,77 +81,190 @@ export default function AdminPanel() {
     })
   }
 
-  // Handle form submission (Add or Update)
- const handleSubmit = async (e) => {
-  e.preventDefault()
-  setLoading(true)
-
-  try {
-       const stockValue = parseInt(formData.stock, 10);
-    const finalStock = isNaN(stockValue) ? 0 : stockValue;
-
-    // A robust way to parse the price value
-    const priceValue = parseFloat(formData.price);
-    const finalPrice = isNaN(priceValue) ? 0 : priceValue;
-
-    
-    const sweetData = {
-      name: formData.name.trim(),
-      category: formData.category,
-      price: finalPrice,
-      stock: finalStock,
-      image: formData.image?.trim() || '/placeholder.jpg',
-    };
-
-    // ✅ Add debug logging to see what's being sent
-    console.log('🍭 Form data before processing:', formData)
-    console.log('🍭 Processed sweet data:', sweetData)
-    console.log('🍭 Stock value:', formData.stock, '→', parseInt(formData.stock))
-
-    if (editingSweet) {
-      await sweetService.updateSweet(editingSweet._id, sweetData)
-      toast.success('Sweet updated successfully! 🍭')
-      setEditingSweet(null)
+  // Handle image file selection
+  const handleImageChange = (e) => {
+    const file = e.target.files[0]
+    if (file) {
+      setImageFile(file)
+      
+      // Create preview URL
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setImagePreview(reader.result)
+      }
+      reader.readAsDataURL(file)
+      
+      // Clear URL input when file is selected
+      setFormData({...formData, image: ''})
     } else {
-      await sweetService.createSweet(sweetData)
-      toast.success('Sweet added successfully! 🍭')
+      setImageFile(null)
+      setImagePreview('')
     }
-
-    // Reset form
-    setFormData({
-      name: '',
-      price: '',
-      image: '',
-      stock: '', // ✅ Make sure this resets properly
-      category: ''
-    })
-
-    // Refresh sweets list
-    await fetchSweets()
-    
-    // Trigger refresh of main SweetCards
-    window.dispatchEvent(new Event('sweetsUpdated'))
-    
-    setActiveTab('view')
-  } catch (error) {
-    console.error('❌ Submit error:', error)
-    toast.error(error.message || 'Failed to save sweet')
-  } finally {
-    setLoading(false)
   }
-}
+
+  // Upload image to server
+  const uploadImage = async (file) => {
+    const formDataUpload = new FormData()
+    formDataUpload.append('image', file)
+    
+    try {
+      console.log('📤 Uploading file:', file.name);
+      
+      // Get the token for authentication
+      const token = localStorage.getItem('token')
+      if (!token) {
+        throw new Error('Please login as admin to upload images')
+      }
+      
+      const response = await fetch(API_ENDPOINTS.upload, { // Use config instead of hardcoded URL
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}` // Add auth token
+        },
+        body: formDataUpload,
+      })
+      
+      if (response.status === 401) {
+        throw new Error('Admin login required to upload images')
+      }
+      
+      if (response.status === 403) {
+        throw new Error('Admin privileges required to upload images')
+      }
+      
+      if (!response.ok) {
+        const errorData = await response.text();
+        throw new Error(`Upload failed: ${response.status} - ${errorData}`);
+      }
+      
+      const data = await response.json()
+      console.log('✅ Upload successful:', data);
+      return data.imageUrl
+    } catch (error) {
+      console.error('❌ Image upload error:', error)
+      
+      // Show specific error messages
+      if (error.message.includes('401') || error.message.includes('Admin login')) {
+        toast.error('Please login as admin to upload images')
+      } else if (error.message.includes('403') || error.message.includes('privileges')) {
+        toast.error('Admin privileges required for image uploads')
+      } else {
+        toast.error('Image upload failed: ' + error.message)
+      }
+      
+      throw error
+    }
+  }
+
+  // Handle form submission (Add or Update)
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setLoading(true)
+
+    try {
+      const stockValue = parseInt(formData.stock, 10);
+      const finalStock = isNaN(stockValue) ? 0 : stockValue;
+
+      const priceValue = parseFloat(formData.price);
+      const finalPrice = isNaN(priceValue) ? 0 : priceValue;
+
+      let imageUrl = 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=400&h=300&fit=crop'
+
+      // Handle image - either upload file or use URL
+      if (imageInputType === 'upload' && imageFile) {
+        try {
+          const uploadedUrl = await uploadImage(imageFile)
+          imageUrl = uploadedUrl // Use the full URL returned from server
+          toast.success('Image uploaded successfully!')
+          console.log('📤 Using uploaded image URL:', imageUrl)
+        } catch (error) {
+          // If upload fails, offer to use URL instead or default image
+          if (error.message.includes('Admin') || error.message.includes('401') || error.message.includes('403')) {
+            toast.error('Upload failed - using default image instead')
+            imageUrl = 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=400&h=300&fit=crop'
+          } else {
+            toast.error('Failed to upload image: ' + error.message)
+            setLoading(false)
+            return
+          }
+        }
+      } else if (imageInputType === 'url' && formData.image.trim()) {
+        imageUrl = formData.image.trim()
+      }
+
+      const sweetData = {
+        name: formData.name.trim(),
+        category: formData.category,
+        price: finalPrice,
+        stock: finalStock,
+        image: imageUrl,
+      };
+
+      console.log('🍭 Processed sweet data:', sweetData)
+
+      if (editingSweet) {
+        await sweetService.updateSweet(editingSweet._id, sweetData)
+        toast.success('Sweet updated successfully! 🍭')
+        setEditingSweet(null)
+      } else {
+        await sweetService.createSweet(sweetData)
+        toast.success('Sweet added successfully! 🍭')
+      }
+
+      // Reset form
+      setFormData({
+        name: '',
+        price: '',
+        stock: '',
+        category: '',
+        image: ''
+      })
+      setImageFile(null)
+      setImagePreview('')
+
+      // Refresh sweets list
+      await fetchSweets()
+      
+      // Trigger refresh of main SweetCards
+      window.dispatchEvent(new Event('sweetsUpdated'))
+      
+      setActiveTab('view')
+    } catch (error) {
+      console.error('❌ Submit error:', error)
+      toast.error(error.message || 'Failed to save sweet')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   // Handle edit sweet
   const handleEdit = (sweet) => {
     setFormData({
       name: sweet.name,
       price: sweet.price.toString(),
-      image: sweet.image || '',
       stock: sweet.stock.toString(),
-      category: sweet.category || ''
+      category: sweet.category || '',
+      image: sweet.image || ''
     })
     setEditingSweet(sweet)
+    setImageFile(null)
+    setImagePreview(sweet.image || '')
+    setImageInputType('url') // Default to URL when editing
     setActiveTab('add')
+  }
+
+  // Cancel editing
+  const handleCancelEdit = () => {
+    setEditingSweet(null)
+    setFormData({
+      name: '',
+      price: '',
+      stock: '',
+      category: '',
+      image: ''
+    })
+    setImageFile(null)
+    setImagePreview('')
   }
 
   // Handle delete sweet
@@ -165,18 +283,6 @@ export default function AdminPanel() {
     } catch (error) {
       toast.error(error.message)
     }
-  }
-
-  // Cancel editing
-  const handleCancelEdit = () => {
-    setEditingSweet(null)
-    setFormData({
-      name: '',
-      price: '',
-      image: '',
-      stock: '',
-      category: ''
-    })
   }
 
   // If not admin, show access denied
@@ -323,30 +429,116 @@ export default function AdminPanel() {
                   </div>
                 </div>
 
-                {/* Image URL */}
+                {/* Image Input with Toggle */}
                 <div className="form-control w-full">
                   <label className="label">
-                    <span className="label-text text-lg font-semibold">Image URL</span>
-                    <span className="label-text-alt">Optional - defaults to placeholder</span>
+                    <span className="label-text text-lg font-semibold">Sweet Image</span>
                   </label>
-                  <input
-                    type="url"
-                    name="image"
-                    placeholder="https://example.com/sweet-image.jpg"
-                    className="input input-bordered w-full"
-                    value={formData.image}
-                    onChange={handleChange}
-                  />
-                  {formData.image && (
-                    <div className="mt-2">
-                      <img 
-                        src={formData.image} 
-                        alt="Preview" 
-                        className="w-32 h-32 object-cover rounded-lg"
-                        onError={(e) => {
-                          e.target.src = '/placeholder.jpg'
+                  
+                  {/* Image Input Type Toggle */}
+                  <div className="tabs tabs-boxed mb-4 w-fit">
+                    <button 
+                      type="button"
+                      className={`tab ${imageInputType === 'url' ? 'tab-active' : ''}`}
+                      onClick={() => {
+                        setImageInputType('url')
+                        setImageFile(null)
+                        setImagePreview(formData.image || '')
+                      }}
+                    >
+                      🔗 Image URL
+                    </button>
+                    <button 
+                      type="button"
+                      className={`tab ${imageInputType === 'upload' ? 'tab-active' : ''}`}
+                      onClick={() => {
+                        setImageInputType('upload')
+                        setFormData({...formData, image: ''})
+                        setImagePreview(imageFile ? URL.createObjectURL(imageFile) : '')
+                      }}
+                      title="Requires admin login for file uploads"
+                    >
+                      📁 Upload File {!isAdmin && '🔒'}
+                    </button>
+                  </div>
+
+                  {/* Show admin requirement notice for uploads */}
+                  {imageInputType === 'upload' && !isAdmin && (
+                    <div className="alert alert-warning mb-4">
+                      <svg className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.996-.833-2.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                      </svg>
+                      <span>Admin login required for file uploads. Please use Image URL instead.</span>
+                    </div>
+                  )}
+
+                  {/* URL Input */}
+                  {imageInputType === 'url' && (
+                    <>
+                      <input
+                        type="url"
+                        name="image"
+                        placeholder="https://example.com/image.jpg"
+                        className="input input-bordered w-full"
+                        value={formData.image}
+                        onChange={(e) => {
+                          handleChange(e)
+                          setImagePreview(e.target.value)
                         }}
                       />
+                      <div className="label">
+                        <span className="label-text-alt">Enter a direct image URL (JPG, PNG, GIF)</span>
+                      </div>
+                    </>
+                  )}
+
+                  {/* File Upload */}
+                  {imageInputType === 'upload' && (
+                    <>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageChange}
+                        className="file-input file-input-bordered w-full"
+                      />
+                      <div className="label">
+                        <span className="label-text-alt">Upload from your device (Max 5MB)</span>
+                      </div>
+                    </>
+                  )}
+
+                  {/* Image Preview */}
+                  {imagePreview && (
+                    <div className="mt-4">
+                      <div className="label">
+                        <span className="label-text font-semibold">Preview:</span>
+                      </div>
+                      <div className="flex justify-center">
+                        <img 
+                          src={imagePreview} 
+                          alt="Preview" 
+                          className="w-48 h-48 object-cover rounded-lg border-2 border-base-300"
+                          onError={(e) => {
+                            e.target.src = 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=400&h=300&fit=crop'
+                          }}
+                        />
+                      </div>
+                      <div className="text-center mt-2">
+                        <button
+                          type="button"
+                          className="btn btn-sm btn-outline btn-error"
+                          onClick={() => {
+                            if (imageInputType === 'url') {
+                              setFormData({...formData, image: ''})
+                            } else {
+                              setImageFile(null)
+                            }
+                            setImagePreview('')
+                          }}
+                        >
+                          Clear Image
+                        </button>
+                      </div>
                     </div>
                   )}
                 </div>

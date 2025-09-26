@@ -2,41 +2,53 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { authService } from '../services/authService'
-import logo from "../assets/misthi-mahal-logo.png"
+import logo from "/misthi-mahal-logo.png"
 import toast from 'react-hot-toast'
 
-export default function Navbar({ onOpenAuth }) {
+export default function Navbar({ onOpenAuth, onOpenCart, cartCount }) {
   const [user, setUser] = useState(null)
-  const [loading, setLoading] = useState(false)
-  const navigate = useNavigate()
+  const [isScrolled, setIsScrolled] = useState(false)
+
+  // Check authentication status
+  const checkAuth = () => {
+    try {
+      const currentUser = authService.getCurrentUser()
+      const isAuthenticated = authService.isAuthenticated()
+      
+      if (isAuthenticated && currentUser) {
+        setUser(currentUser)
+      } else {
+        setUser(null)
+      }
+    } catch (error) {
+      console.error('Auth check error:', error)
+      setUser(null)
+    }
+  }
 
   useEffect(() => {
-    const checkAuth = () => {
-      const currentUser = authService.getCurrentUser()
-      setUser(currentUser)
-    }
-
     checkAuth()
-    window.addEventListener('authChange', checkAuth)
+    
+    // Listen for auth changes
+    const handleStorageChange = () => {
+      checkAuth()
+    }
+    
+    window.addEventListener('storage', handleStorageChange)
+    window.addEventListener('authChange', handleStorageChange)
     
     return () => {
-      window.removeEventListener('authChange', checkAuth)
+      window.removeEventListener('storage', handleStorageChange)
+      window.removeEventListener('authChange', handleStorageChange)
     }
   }, [])
 
-  const handleLogout = async () => {
-    try {
-      setLoading(true)
-      authService.logout()
-      setUser(null)
-      toast.success('Logged out successfully! 👋')
-      navigate('/')
-      window.dispatchEvent(new Event('authChange'))
-    } catch {  // error
-      toast.error('Logout failed')
-    } finally {
-      setLoading(false)
-    }
+  const handleLogout = () => {
+    authService.logout()
+    setUser(null)
+    toast.success('Logged out successfully')
+    // Trigger auth change event
+    window.dispatchEvent(new Event('authChange'))
   }
 
   return (
@@ -101,7 +113,7 @@ export default function Navbar({ onOpenAuth }) {
                   <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-orange-200">
                     <img 
                       alt="User avatar" 
-                      src="/src/assets/placeholder-user.jpg"
+                      src="/placeholder-user.jpg"
                       className="w-full h-full object-cover"
                     />
                   </div>
@@ -109,7 +121,7 @@ export default function Navbar({ onOpenAuth }) {
                 
                 <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow-lg bg-white rounded-lg border border-border w-52 mt-2">
                   <li className="px-3 py-2 border-b border-border">
-                    <div className="flex flex-col">
+                    <div className="flex flex-col text-black">
                       <span className="font-medium text-foreground">{user.name}</span>
                       <span className="text-sm text-muted-foreground">{user.email}</span>
                       {authService.isAdmin() && (
@@ -122,9 +134,9 @@ export default function Navbar({ onOpenAuth }) {
                     <li>
                       <Link 
                         to="/admin" 
-                        className="flex items-center px-3 py-2 text-sm hover:bg-orange-50 transition-colors"
+                        className="flex items-center px-3 py-2 text-sm hover:bg-orange-50 transition-colors text-black"
                       >
-                        <span className="mr-2">⚙️</span>
+                        <span className="mr-2 tex">⚙️</span>
                         Admin Panel
                       </Link>
                     </li>
@@ -133,11 +145,10 @@ export default function Navbar({ onOpenAuth }) {
                   <li>
                     <button 
                       onClick={handleLogout}
-                      disabled={loading}
                       className="flex items-center px-3 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors w-full text-left"
                     >
                       <span className="mr-2">🚪</span>
-                      {loading ? 'Logging out...' : 'Logout'}
+                      Logout
                     </button>
                   </li>
                 </ul>

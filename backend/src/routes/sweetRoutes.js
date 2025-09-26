@@ -6,8 +6,10 @@ import {
   getSweetById,
   updateSweet,
   deleteSweet,
-  purchaseSweet,    // Add this
-  restockSweet      // Add this
+  purchaseSweet,
+  restockSweet,
+  upload,
+  uploadImage
 } from '../controllers/sweetController.js';
 import { authenticateToken } from '../middleware/auth.js';
 import { requireAdmin } from '../middleware/admin.js';
@@ -18,6 +20,9 @@ const router = express.Router();
 router.get('/', authenticateToken, getAllSweets);
 router.get('/search', authenticateToken, searchSweets);
 router.get('/:id', authenticateToken, getSweetById);
+
+// Image upload route
+router.post('/upload', authenticateToken, requireAdmin, upload.single('image'), uploadImage);
 
 // Inventory routes
 router.post('/:id/purchase', authenticateToken, purchaseSweet);           // Any user can purchase

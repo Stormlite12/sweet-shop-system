@@ -28,7 +28,7 @@ function App() {
         <Navbar 
           onOpenAuth={() => setShowAuthModal(true)}
           onOpenCart={() => setShowCartSidebar(true)}
-          cartItemsCount={cart.getTotalItems()}
+          cartCount={cart.getTotalItems()}
         />
         
         <Routes>

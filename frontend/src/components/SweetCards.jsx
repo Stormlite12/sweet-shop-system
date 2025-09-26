@@ -45,6 +45,30 @@ export default function SweetCards({ cart, onOpenCart }) {
     fetchSweets()
   }, [])
 
+  // Add effect to listen for sweet updates only
+  useEffect(() => {
+    const handleSweetsUpdate = async () => {
+      try {
+        const data = await sweetService.getAllSweets()
+        if (Array.isArray(data)) {
+          setSweets(data)
+        } else if (data && Array.isArray(data.sweets)) {
+          setSweets(data.sweets)
+        } else if (data && Array.isArray(data.data)) {
+          setSweets(data.data)
+        }
+      } catch (err) {
+        console.error('Error refreshing sweets:', err)
+      }
+    }
+
+    window.addEventListener('sweetsUpdated', handleSweetsUpdate)
+    
+    return () => {
+      window.removeEventListener('sweetsUpdated', handleSweetsUpdate)
+    }
+  }, [])
+
   const categories = [
     'All Categories', 
     ...new Set(
@@ -148,7 +172,7 @@ export default function SweetCards({ cart, onOpenCart }) {
               placeholder="Search sweets..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
+              className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white text-black placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
             />
           </div>
 
@@ -190,7 +214,7 @@ export default function SweetCards({ cart, onOpenCart }) {
                 {/* Sweet Image */}
                 <div className="aspect-[4/3] overflow-hidden">
                   <img
-                    src={sweet.image || "/src/assets/placeholder.jpg"}
+                    src={sweet.image || "/placeholder.jpg"}
                     alt={sweet.name || "Sweet"}
                     className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 ${isOutOfStock ? 'grayscale opacity-50' : ''}`}
                     onError={(e) => {
