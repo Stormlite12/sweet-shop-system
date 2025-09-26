@@ -1,6 +1,6 @@
 // tests/auth.test.js
 import request from 'supertest';
-import app from "../src/app.js" 
+import app from './testApp.js'
 import mongoose from 'mongoose';
 import User from '../src/models/User.js';
 import dotenv from 'dotenv';

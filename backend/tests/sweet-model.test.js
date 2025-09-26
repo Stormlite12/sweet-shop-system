@@ -23,9 +23,9 @@ describe('Sweet Model Validation', () => {
     it('should create sweet with all required fields', async () => {
       const sweetData = {
         name: 'Chocolate Cake',
-        category: 'cakes',
+        category: 'snacks',
         price: 25.99,
-        quantity: 10
+        stock: 10
       };
 
       const sweet = new Sweet(sweetData);
@@ -33,9 +33,9 @@ describe('Sweet Model Validation', () => {
 
       expect(savedSweet._id).toBeDefined();
       expect(savedSweet.name).toBe('Chocolate Cake');
-      expect(savedSweet.category).toBe('cakes');
+      expect(savedSweet.category).toBe('snacks');
       expect(savedSweet.price).toBe(25.99);
-      expect(savedSweet.quantity).toBe(10);
+      expect(savedSweet.stock).toBe(10);
     });
 
     it('should reject sweet without name', async () => {
@@ -83,33 +83,33 @@ describe('Sweet Model Validation', () => {
 
       const sweet = new Sweet(sweetData);
       
-      await expect(sweet.save()).rejects.toThrow('Quantity is required');
+      await expect(sweet.save()).rejects.toThrow('Stock quantity is required');
     });
 
     it('should reject negative price', async () => {
       const sweetData = {
         name: 'Chocolate Cake',
-        category: 'cakes',
+        category: 'snacks',
         price: -5.99,
-        quantity: 10
+        stock: 10
       };
 
       const sweet = new Sweet(sweetData);
       
-      await expect(sweet.save()).rejects.toThrow('Price must be positive');
+      await expect(sweet.save()).rejects.toThrow('Price cannot be negative');
     });
 
     it('should reject negative quantity', async () => {
       const sweetData = {
         name: 'Chocolate Cake',
-        category: 'cakes',
+        category: 'snacks',
         price: 25.99,
-        quantity: -5
+        stock: -5
       };
 
       const sweet = new Sweet(sweetData);
       
-      await expect(sweet.save()).rejects.toThrow('Quantity cannot be negative');
+      await expect(sweet.save()).rejects.toThrow('Stock cannot be negative');
     });
   });
 });

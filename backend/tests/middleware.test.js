@@ -1,5 +1,5 @@
 import request from 'supertest';
-import app from '../src/app.js';
+import app from './testApp.js';
 import mongoose from 'mongoose';
 import User from '../src/models/User.js';
 import jwt from 'jsonwebtoken';
@@ -34,9 +34,9 @@ describe('JWT Authentication Middleware', () => {
   });
 
   afterAll(async () => {
-    await mongoose.connection.close();
-     // Force clean on start
+    // Clean after tests then close connection
     await User.deleteMany();
+    await mongoose.connection.close();
   });
 
   describe('Protected Route Access', () => {

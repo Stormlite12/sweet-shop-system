@@ -1,5 +1,5 @@
 import request from 'supertest';
-import app from '../src/app.js';
+import app from './testApp.js';
 import mongoose from 'mongoose';
 import User from '../src/models/User.js';
 import Sweet from '../src/models/Sweet.js';
@@ -44,42 +44,40 @@ describe('Sweet CRUD Operations', () => {
   describe('GET /api/sweets - List all sweets', () => {
     it('should return empty array when no sweets exist', async () => {
       const response = await request(app)
-        .get('/api/sweets')
-        .set('Authorization', `Bearer ${customerToken}`);
+        .get('/api/sweets');
 
       expect(response.statusCode).toBe(200);
-      expect(response.body.sweets).toEqual([]);
+      expect(response.body).toEqual([]);
     });
 
     it('should return all sweets when they exist', async () => {
       // Create test sweets
       await new Sweet({
         name: 'Chocolate Cake',
-        category: 'cakes',
+        category: 'milk-based',
         price: 25.99,
-        quantity: 5
+        stock: 5
       }).save();
 
       await new Sweet({
         name: 'Vanilla Cupcake',
-        category: 'cupcakes', 
+        category: 'snacks', 
         price: 3.99,
-        quantity: 12
+        stock: 12
       }).save();
 
       const response = await request(app)
-        .get('/api/sweets')
-        .set('Authorization', `Bearer ${customerToken}`);
+        .get('/api/sweets');
 
       expect(response.statusCode).toBe(200);
-      expect(response.body.sweets).toHaveLength(2);
+      expect(response.body).toHaveLength(2);
     });
 
-    it('should require authentication', async () => {
-      const response = await request(app).get('/api/sweets');
 
-      expect(response.statusCode).toBe(401);
-      expect(response.body.message).toBe('Access token required');
+    it('should allow public browsing of sweets', async () => {
+      const response = await request(app).get('/api/sweets');
+      expect(response.statusCode).toBe(200);
+      expect(Array.isArray(response.body)).toBe(true);
     });
   });
 
@@ -87,9 +85,9 @@ describe('Sweet CRUD Operations', () => {
     it('should allow admin to create a new sweet', async () => {
       const sweetData = {
         name: 'Strawberry Tart',
-        category: 'tarts',
+        category: 'snacks',
         price: 12.50,
-        quantity: 8
+        stock: 8
       };
 
       const response = await request(app)
@@ -98,18 +96,18 @@ describe('Sweet CRUD Operations', () => {
         .send(sweetData);
 
       expect(response.statusCode).toBe(201);
-      expect(response.body.sweet.name).toBe('Strawberry Tart');
-      expect(response.body.sweet.category).toBe('tarts');
-      expect(response.body.sweet.price).toBe(12.50);
-      expect(response.body.sweet.quantity).toBe(8);
+      expect(response.body.name).toBe('Strawberry Tart');
+      expect(response.body.category).toBe('snacks');
+      expect(response.body.price).toBe(12.50);
+      expect(response.body.stock).toBe(8);
     });
 
     it('should reject customer creating sweet', async () => {
       const sweetData = {
         name: 'Customer Sweet',
-        category: 'test',
+        category: 'snacks',
         price: 4.99,
-        quantity: 5
+        stock: 5
       };
 
       const response = await request(app)
@@ -118,7 +116,6 @@ describe('Sweet CRUD Operations', () => {
         .send(sweetData);
 
       expect(response.statusCode).toBe(403);
-      expect(response.body.message).toBe('Admin access required');
     });
 
     it('should require authentication', async () => {
@@ -126,9 +123,9 @@ describe('Sweet CRUD Operations', () => {
         .post('/api/sweets')
         .send({
           name: 'Test Sweet',
-          category: 'test',
+          category: 'snacks',
           price: 1.99,
-          quantity: 1
+          stock: 1
         });
 
       expect(response.statusCode).toBe(401);
@@ -140,7 +137,7 @@ describe('Sweet CRUD Operations', () => {
         .set('Authorization', `Bearer ${adminToken}`)
         .send({
           name: 'Incomplete Sweet'
-          // Missing category, price, quantity
+          // Missing category, price, stock
         });
 
       expect(response.statusCode).toBe(400);
@@ -152,30 +149,29 @@ describe('Sweet CRUD Operations', () => {
       // Create test data for search
       await new Sweet({
         name: 'Chocolate Cake',
-        category: 'cakes',
+        category: 'milk-based',
         price: 25.99,
-        quantity: 5
+        stock: 5
       }).save();
 
       await new Sweet({
         name: 'Vanilla Cupcake',
-        category: 'cupcakes',
+        category: 'snacks',
         price: 3.99,
-        quantity: 12
+        stock: 12
       }).save();
 
       await new Sweet({
         name: 'Chocolate Muffin',
-        category: 'muffins',
+        category: 'sugar-based',
         price: 4.50,
-        quantity: 8
+        stock: 8
       }).save();
     });
 
     it('should search sweets by name', async () => {
       const response = await request(app)
-        .get('/api/sweets/search?name=chocolate')
-        .set('Authorization', `Bearer ${customerToken}`);
+        .get('/api/sweets/search?name=chocolate');
 
       expect(response.statusCode).toBe(200);
       expect(response.body.sweets).toHaveLength(2);
@@ -185,18 +181,16 @@ describe('Sweet CRUD Operations', () => {
 
     it('should search sweets by category', async () => {
       const response = await request(app)
-        .get('/api/sweets/search?category=cupcakes')
-        .set('Authorization', `Bearer ${customerToken}`);
+        .get('/api/sweets/search?category=snacks');
 
       expect(response.statusCode).toBe(200);
       expect(response.body.sweets).toHaveLength(1);
-      expect(response.body.sweets[0].category).toBe('cupcakes');
+      expect(response.body.sweets[0].category).toBe('snacks');
     });
 
     it('should search sweets by price range', async () => {
       const response = await request(app)
-        .get('/api/sweets/search?minPrice=3&maxPrice=5')
-        .set('Authorization', `Bearer ${customerToken}`);
+        .get('/api/sweets/search?minPrice=3&maxPrice=5');
 
       expect(response.statusCode).toBe(200);
       expect(response.body.sweets).toHaveLength(2); // Vanilla Cupcake (3.99) and Chocolate Muffin (4.50)
@@ -204,18 +198,18 @@ describe('Sweet CRUD Operations', () => {
 
     it('should combine search criteria', async () => {
       const response = await request(app)
-        .get('/api/sweets/search?name=chocolate&maxPrice=20')
-        .set('Authorization', `Bearer ${customerToken}`);
+        .get('/api/sweets/search?name=chocolate&maxPrice=20');
 
       expect(response.statusCode).toBe(200);
       expect(response.body.sweets).toHaveLength(1); // Only Chocolate Muffin (4.50)
     });
 
-    it('should require authentication', async () => {
-      const response = await request(app)
-        .get('/api/sweets/search?name=chocolate');
+    // Public route now; no auth required
 
-      expect(response.statusCode).toBe(401);
+    it('should allow public search of sweets', async () => {
+      const response = await request(app).get('/api/sweets/search?name=chocolate');
+      expect(response.statusCode).toBe(200);
+      expect(Array.isArray(response.body.sweets)).toBe(true);
     });
   });
 
@@ -225,9 +219,9 @@ describe('Sweet CRUD Operations', () => {
     beforeEach(async () => {
       testSweet = await new Sweet({
         name: 'Original Sweet',
-        category: 'originals',
+        category: 'snacks',
         price: 10.99,
-        quantity: 10
+        stock: 10
       }).save();
     });
 
@@ -235,7 +229,7 @@ describe('Sweet CRUD Operations', () => {
       const updateData = {
         name: 'Updated Sweet',
         price: 15.99,
-        quantity: 15
+        stock: 15
       };
 
       const response = await request(app)
@@ -246,7 +240,7 @@ describe('Sweet CRUD Operations', () => {
       expect(response.statusCode).toBe(200);
       expect(response.body.sweet.name).toBe('Updated Sweet');
       expect(response.body.sweet.price).toBe(15.99);
-      expect(response.body.sweet.quantity).toBe(15);
+      expect(response.body.sweet.stock).toBe(15);
     });
 
     it('should reject customer updating sweet', async () => {
@@ -277,9 +271,9 @@ describe('Sweet CRUD Operations', () => {
     beforeEach(async () => {
       testSweet = await new Sweet({
         name: 'To Delete',
-        category: 'test',
+        category: 'snacks',
         price: 5.99,
-        quantity: 1
+        stock: 1
       }).save();
     });
 

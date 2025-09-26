@@ -1,5 +1,5 @@
 import request from 'supertest';
-import app from '../src/app.js';
+import app from './testApp.js';
 import mongoose from 'mongoose';
 import User from '../src/models/User.js';
 import dotenv from 'dotenv';
@@ -11,7 +11,7 @@ describe('First User Admin Registration', () => {
     await mongoose.connect(process.env.MONGO_TEST_URI);
   });
 
-  afterEach(async () => {
+  beforeEach(async () => {
     await User.deleteMany();
   });
 
@@ -175,4 +175,6 @@ describe('First User Admin Registration', () => {
       expect(response.body.user.email).toBe('customer@test.com');
     });
   });
+
+  // Note: avoid global dropDatabase here; each suite cleans up its own data
 });
