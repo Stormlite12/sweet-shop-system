@@ -11,14 +11,55 @@ dotenv.config()
 
 const app = express()
 
+// 🔥 PRODUCTION CORS FIX - Add your Vercel domains
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:3000', 
+  'http://127.0.0.1:5173',
+  'https://sweet-shop-system.vercel.app',  // ✅ Your actual Vercel URL
+  'https://*.vercel.app',                   // ✅ Allow all Vercel preview URLs
+  'https://your-custom-domain.com'          // Add your custom domain if you have one
+]
+
 // CORS configuration
 app.use(cors({
-  origin: true,
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true)
+    
+    // Check if the origin is in our allowed list or matches a pattern
+    if (allowedOrigins.some(allowedOrigin => {
+      if (allowedOrigin.includes('*')) {
+        // Handle wildcard patterns like *.vercel.app
+        const pattern = allowedOrigin.replace('*', '.*')
+        return new RegExp(pattern).test(origin)
+      }
+      return allowedOrigin === origin
+    })) {
+      return callback(null, true)
+    }
+    
+    console.log('❌ CORS blocked origin:', origin)
+    const msg = 'The CORS policy for this site does not allow access from the specified Origin.'
+    return callback(new Error(msg), false)
+  },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: [
+    'Origin',
+    'X-Requested-With',
+    'Content-Type',
+    'Accept',
+    'Authorization',
+    'Cache-Control',
+    'Pragma'
+  ],
+  exposedHeaders: ['Set-Cookie'],
+  maxAge: 86400, // 24 hours
 }))
 
+// Handle preflight OPTIONS requests
+app.options('*', cors())
 
 
 // Middleware

@@ -3,7 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import path from 'path';
 import fs from 'fs';
-import connectDB from './config/db.js'; // Changed from database.js to db.js
+import connectDB from './config/db.js';
 import sweetRoutes from './routes/sweetRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import dotenv from 'dotenv';
@@ -24,20 +24,44 @@ if (!fs.existsSync(uploadsDir)) {
 app.use('/uploads', express.static(uploadsDir));
 console.log('📁 Serving static files from:', uploadsDir);
 
+// 🔥 PRODUCTION CORS FIX
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:3000', 
+  'http://127.0.0.1:5173',
+  'https://sweet-shop-system.vercel.app',  // ✅ Your Vercel URL
+  'https://*.vercel.app',                   // ✅ Vercel preview URLs
+]
+
 // Middleware
 app.use(cors({
-  origin: [
-    'http://localhost:5173', 
-    'http://localhost:3000', 
-    'http://127.0.0.1:5173',
-    'https://your-frontend-domain.com',        // Add your deployed frontend URL
-    'https://your-app.netlify.app',            // If using Netlify
-    'https://your-app.vercel.app',             // If using Vercel
-    'https://your-custom-domain.com'           // Your custom domain
-  ],
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps, Postman, etc.)
+    if (!origin) return callback(null, true)
+    
+    if (allowedOrigins.some(allowedOrigin => {
+      if (allowedOrigin.includes('*')) {
+        const pattern = allowedOrigin.replace('*', '.*')
+        return new RegExp(pattern).test(origin)
+      }
+      return allowedOrigin === origin
+    })) {
+      return callback(null, true)
+    }
+    
+    console.log('❌ CORS blocked origin:', origin)
+    return callback(new Error('Not allowed by CORS'), false)
+  },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: [
+    'Origin',
+    'X-Requested-With', 
+    'Content-Type',
+    'Accept',
+    'Authorization',
+    'Cache-Control'
+  ]
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

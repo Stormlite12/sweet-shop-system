@@ -16,17 +16,17 @@ import { requireAdmin } from '../middleware/admin.js';
 
 const router = express.Router();
 
-// Public routes (require authentication)
-router.get('/', authenticateToken, getAllSweets);
-router.get('/search', authenticateToken, searchSweets);
-router.get('/:id', authenticateToken, getSweetById);
+// Public routes (NO authentication required for viewing)
+router.get('/', getAllSweets);  // Remove authenticateToken
+router.get('/search', searchSweets);  // Remove authenticateToken  
+router.get('/:id', getSweetById);  // Remove authenticateToken
 
-// Image upload route
+// Image upload route (admin only)
 router.post('/upload', authenticateToken, requireAdmin, upload.single('image'), uploadImage);
 
-// Inventory routes
-router.post('/:id/purchase', authenticateToken, purchaseSweet);           // Any user can purchase
-router.post('/:id/restock', authenticateToken, requireAdmin, restockSweet); // Admin only
+// Purchase requires authentication
+router.post('/:id/purchase', authenticateToken, purchaseSweet);
+router.post('/:id/restock', authenticateToken, requireAdmin, restockSweet);
 
 // Admin only routes
 router.post('/', authenticateToken, requireAdmin, createSweet);
