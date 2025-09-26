@@ -2,6 +2,18 @@
 
 A modern, full-featured e-commerce application for a traditional Indian sweet shop, built with the MERN stack and featuring authentication, cart management, and admin functionality.
 
+Layout
+<img width="2447" height="1345" alt="Hero" src="https://github.com/user-attachments/assets/839a2685-1ade-4a29-b37c-579352a32c64" />
+<img width="1452" height="1190" alt="Login-Register" src="https://github.com/user-attachments/assets/e9be94b2-68ec-4c29-a06e-794320ef1f94" />
+<img width="1452" height="1190" alt="Login-Register" src="https://github.com/user-attachments/assets/814d0361-848b-4494-bb8f-ea5d18c72200" />
+
+Admin Panel
+<img width="1682" height="1234" alt="Admin Panel-1" src="https://github.com/user-attachments/assets/54486bf8-b67b-48e9-8dcf-076027332fa1" />
+<img width="2024" height="1213" alt="Admin Panel-2" src="https://github.com/user-attachments/assets/c4fe61e6-dd5b-4ddb-b6be-c818c89bd4a9" />
+<img width="1596" height="1259" alt="Admin Panel-3" src="https://github.com/user-attachments/assets/b66fc691-4539-45ed-9ffb-292d4a528524" />
+
+
+
 ## 📋 Table of Contents
 
 - [Features](#features)
