@@ -4,14 +4,14 @@ import { ReactCompareSlider, ReactCompareSliderImage } from "react-compare-slide
 
 const slides = [
   {
-    before: { src: "/src/assets/halwai-working-1.jpg", alt: "Hardworking Halwai crafting sweets" },
-    after: { src: "/src/assets/delicious-sweets-1.jpg", alt: "Assortment of delicious Indian sweets" },
+    before: { src: "/halwai-working-1.jpg", alt: "Hardworking Halwai crafting sweets" },
+    after: { src: "/delicious-sweets-1.jpg", alt: "Assortment of delicious Indian sweets" },
     title: "From Craft to Culinary Delight",
     description: "Witness the dedication of our Halwais transform into exquisite traditional sweets.",
   },
   {
-    before: { src: "/src/assets/halwai-working-2.jpg", alt: "Halwai meticulously preparing sweets" },
-    after: { src: "/src/assets/delicious-sweets-2.jpg", alt: "Beautifully arranged Indian sweets" },
+    before: { src: "/halwai-working-2.jpg", alt: "Halwai meticulously preparing sweets" },
+    after: { src: "/delicious-sweets-2.jpg", alt: "Beautifully arranged Indian sweets" },
     title: "The Art of Sweet Making",
     description: "Generations of expertise, handcrafted with love, bringing you the finest flavors.",
   },

@@ -95,7 +95,7 @@ export default function AdminPanel() {
       category: formData.category,
       price: finalPrice,
       stock: finalStock,
-      image: formData.image?.trim() || '/src/assets/placeholder.jpg',
+      image: formData.image?.trim() || '/placeholder.jpg',
     };
 
     // ✅ Add debug logging to see what's being sent
@@ -344,7 +344,7 @@ export default function AdminPanel() {
                         alt="Preview" 
                         className="w-32 h-32 object-cover rounded-lg"
                         onError={(e) => {
-                          e.target.src = '/src/assets/placeholder.jpg'
+                          e.target.src = '/placeholder.jpg'
                         }}
                       />
                     </div>
@@ -416,11 +416,11 @@ export default function AdminPanel() {
                     <div key={sweet._id} className="card bg-base-200 shadow-md">
                       <figure className="px-4 pt-4">
                         <img
-                          src={sweet.image || '/src/assets/placeholder.jpg'}
+                          src={sweet.image || '/placeholder.jpg'}
                           alt={sweet.name}
                           className="rounded-xl w-full h-48 object-cover"
                           onError={(e) => {
-                            e.target.src = '/src/assets/placeholder.jpg'
+                            e.target.src = '/placeholder.jpg'
                           }}
                         />
                       </figure>
@@ -489,10 +489,10 @@ export default function AdminPanel() {
                               <div className="avatar">
                                 <div className="mask mask-squircle w-12 h-12">
                                   <img
-                                    src={sweet.image || '/src/assets/placeholder.jpg'}
+                                    src={sweet.image || '/placeholder.jpg'}
                                     alt={sweet.name}
                                     onError={(e) => {
-                                      e.target.src = '/src/assets/placeholder.jpg'
+                                      e.target.src = '/placeholder.jpg'
                                     }}
                                   />
                                 </div>

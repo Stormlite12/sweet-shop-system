@@ -175,11 +175,11 @@ export default function CartSidebar({ isOpen, onClose, cart }) {
                   return (
                     <div key={sweet._id} className="flex space-x-3 p-4 bg-orange-50/50 rounded-lg border border-orange-100 hover:bg-orange-50/70 transition-colors">
                       <img
-                        src={sweet.image || "/src/assets/placeholder.jpg"}
+                        src={sweet.image || "/placeholder.jpg"}
                         alt={sweet.name}
                         className="w-16 h-16 object-cover rounded-lg border border-orange-200 flex-shrink-0"
                         onError={(e) => {
-                          e.target.src = "/src/assets/placeholder.jpg"
+                          e.target.src = "/placeholder.jpg"
                         }}
                       />
                       

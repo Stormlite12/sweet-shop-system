@@ -11,7 +11,7 @@ const defaultSweets = [
     price: 150,
     stock: 50,
     category: "Milk Sweets",
-    image: "/src/assets/gulab-jamun-sweet.jpg"
+    image: "/gulab-jamun-sweet.jpg"
   },
   {
     name: "Rasgulla",
@@ -19,7 +19,7 @@ const defaultSweets = [
     price: 120,
     stock: 40,
     category: "Milk Sweets",
-    image: "/src/assets/rasgulla-sweet.jpg"
+    image: "/rasgulla-sweet.jpg"
   },
   {
     name: "Jalebi",
@@ -27,7 +27,7 @@ const defaultSweets = [
     price: 180,
     stock: 35,
     category: "Festival Specials",
-    image: "/src/assets/jalebi-sweet.jpg"
+    image: "/jalebi-sweet.jpg"
   },
   {
     name: "Kaju Katli",
@@ -35,7 +35,7 @@ const defaultSweets = [
     price: 300,
     stock: 25,
     category: "Dry Fruits",
-    image: "/src/assets/kaju-katli-sweet.jpg"
+    image: "/kaju-katli-sweet.jpg"
   },
   {
     name: "Motichoor Ladoo",
@@ -43,7 +43,7 @@ const defaultSweets = [
     price: 200,
     stock: 30,
     category: "Festival Specials",
-    image: "/src/assets/ladoo-sweet.jpg"
+    image: "/ladoo-sweet.jpg"
   },
   {
     name: "Barfi",
@@ -51,7 +51,7 @@ const defaultSweets = [
     price: 250,
     stock: 20,
     category: "Milk Sweets",
-    image: "/src/assets/barfi-sweet.jpg"
+    image: "/barfi-sweet.jpg"
   },
   {
     name: "Kesar Pista Kulfi",
@@ -59,7 +59,7 @@ const defaultSweets = [
     price: 80,
     stock: 45,
     category: "Frozen Treats",
-    image: "/src/assets/placeholder.jpg"
+    image: "/placeholder.jpg"
   },
   {
     name: "Ras Malai",
@@ -67,7 +67,7 @@ const defaultSweets = [
     price: 160,
     stock: 35,
     category: "Milk Sweets",
-    image: "/src/assets/placeholder.jpg"
+    image: "/placeholder.jpg"
   }
 ]
 
