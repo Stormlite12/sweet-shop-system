@@ -1,13 +1,13 @@
 // src/components/Navbar.jsx
 import { useState, useEffect } from 'react'
 import { authService } from '../services/authService.jsx'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import logo from "/misthi-mahal-logo.png"
 import toast from 'react-hot-toast'
 
-export default function Navbar({ onOpenAuth, onOpenCart, cartCount }) {
+export default function Navbar({ onOpenAuth }) {
   const [user, setUser] = useState(null)
-  const [isScrolled, setIsScrolled] = useState(false)
+
 
   // Check authentication status
   const checkAuth = () => {
@@ -69,24 +69,26 @@ export default function Navbar({ onOpenAuth, onOpenCart, cartCount }) {
         </span>
         </Link>
 
-        {/* Navigation */}
-        <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
-          <Link 
-            to="/" 
-            className="transition-colors text-orange-600 "
-          >
-            Home
-          </Link>
-          {user && authService.isAdmin() && (
-            <Link 
-              to="/admin" 
-              className="transition-colors text-orange-600 "
-            >
-              Admin Panel
-            </Link>
-          )}
-        </nav>
 
+<nav className={`hidden md:flex items-center h-24 text-md font-medium space-x-10 ${
+    user && authService.isAdmin() ? 'justify-center mr-0' : 'justify-start mr-40'
+}`}>
+    <Link 
+        to="/" 
+        className="transition-colors text-orange-600 flex items-center h-24"
+    >
+        Home
+    </Link>
+    
+    {user && authService.isAdmin() && (
+        <Link 
+            to="/admin" 
+            className="transition-colors text-orange-600 flex items-center h-24"
+        >
+            Admin Panel
+        </Link>
+    )}
+</nav>
         {/* User Menu */}
         <div className="flex items-center space-x-4">
           
