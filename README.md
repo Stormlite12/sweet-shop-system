@@ -6,7 +6,8 @@ A modern, full-featured e-commerce application for a traditional Indian sweet sh
 Layout
 <img width="2447" height="1345" alt="Hero" src="https://github.com/user-attachments/assets/839a2685-1ade-4a29-b37c-579352a32c64" />
 <img width="1452" height="1190" alt="Login-Register" src="https://github.com/user-attachments/assets/e9be94b2-68ec-4c29-a06e-794320ef1f94" />
-<img width="1452" height="1190" alt="Login-Register" src="https://github.com/user-attachments/assets/814d0361-848b-4494-bb8f-ea5d18c72200" />
+<img width="2262" height="1346" alt="Sweets Grid" src="https://github.com/user-attachments/assets/8f962bc9-a446-4fd6-a63c-4369a90e6e62" />
+
 
 Admin Panel
 <img width="1682" height="1234" alt="Admin Panel-1" src="https://github.com/user-attachments/assets/54486bf8-b67b-48e9-8dcf-076027332fa1" />
