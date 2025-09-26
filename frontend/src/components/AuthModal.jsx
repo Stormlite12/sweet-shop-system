@@ -60,10 +60,10 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
 
   return (
     <div className="modal modal-open">
-      <div className="modal-box w-96 max-w-md">
+      <div className="modal-box w-96 max-w-md bg-gradient-to-b from-orange-50 to-amber-50 border border-orange-200">
         {/* Close Button */}
         <button 
-          className="btn btn-sm btn-circle btn-ghost absolute right-4 top-4"
+          className="btn btn-sm btn-circle btn-ghost absolute right-4 top-4 hover:bg-orange-100 text-orange-700"
           onClick={() => {
             resetForm()
             onClose()
@@ -74,22 +74,30 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
 
         {/* Header */}
         <div className="text-center mb-6">
-          <h2 className="text-2xl font-bold text-primary">🍭 Sweet Shop</h2>
-          <p className="text-base-content/70 mt-2">
+          <h2 className="text-2xl font-bold text-orange-600">Sweet Shop</h2>
+          <p className="text-orange-800/70 mt-2">
             {activeTab === 'login' ? 'Welcome back!' : 'Join our sweet family!'}
           </p>
         </div>
 
         {/* Tabs */}
-        <div className="tabs tabs-boxed justify-center mb-6">
+        <div className="flex bg-orange-100 rounded-lg p-1 mb-6">
           <button 
-            className={`tab tab-lg flex-1 ${activeTab === 'login' ? 'tab-active' : ''}`}
+            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+              activeTab === 'login' 
+                ? 'bg-orange-600 text-white shadow-sm' 
+                : 'text-orange-700 hover:bg-orange-200'
+            }`}
             onClick={() => setActiveTab('login')}
           >
             Login
           </button>
           <button 
-            className={`tab tab-lg flex-1 ${activeTab === 'register' ? 'tab-active' : ''}`}
+            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+              activeTab === 'register' 
+                ? 'bg-orange-600 text-white shadow-sm' 
+                : 'text-orange-700 hover:bg-orange-200'
+            }`}
             onClick={() => setActiveTab('register')}
           >
             Register
@@ -101,12 +109,12 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
           {/* Email */}
           <div className="form-control">
             <label className="label">
-              <span className="label-text">Email</span>
+              <span className="label-text text-orange-800 font-medium">Email</span>
             </label>
             <input 
               type="email" 
               name="email"
-              className="input input-bordered focus:input-primary" 
+              className="input input-bordered border-orange-300 focus:border-orange-500 focus:ring-orange-500 bg-white text-gray-900 placeholder-gray-500" 
               placeholder="your@email.com"
               value={formData.email}
               onChange={handleInputChange}
@@ -118,12 +126,12 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
           {/* Password */}
           <div className="form-control">
             <label className="label">
-              <span className="label-text">Password</span>
+              <span className="label-text text-orange-800 font-medium">Password</span>
             </label>
             <input 
               type="password" 
               name="password"
-              className="input input-bordered focus:input-primary" 
+              className="input input-bordered border-orange-300 focus:border-orange-500 focus:ring-orange-500 bg-white text-gray-900 placeholder-gray-500" 
               placeholder="••••••••"
               value={formData.password}
               onChange={handleInputChange}
@@ -133,7 +141,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
             />
             {activeTab === 'register' && (
               <label className="label">
-                <span className="label-text-alt">Minimum 6 characters</span>
+                <span className="label-text-alt text-orange-600">Minimum 6 characters</span>
               </label>
             )}
           </div>
@@ -141,13 +149,13 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
           {/* Submit Button */}
           <button 
             type="submit"
-            className={`btn btn-primary w-full mt-6 ${loading ? 'loading' : ''}`}
+            className={`btn w-full mt-6 bg-orange-600 hover:bg-orange-700 border-orange-600 hover:border-orange-700 text-white ${loading ? 'loading' : ''}`}
             disabled={loading}
           >
             {loading ? (
               'Please wait...'
             ) : (
-              activeTab === 'login' ? '🔑 Login' : '✨ Register'
+              activeTab === 'login' ? 'Login' : 'Register'
             )}
           </button>
         </form>
@@ -155,10 +163,10 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
         {/* Switch Tab Helper */}
         <div className="text-center mt-4 text-sm">
           {activeTab === 'login' ? (
-            <p>
+            <p className="text-orange-800">
               Don't have an account?{' '}
               <button 
-                className="link link-primary" 
+                className="text-orange-600 hover:text-orange-700 font-medium underline" 
                 onClick={() => setActiveTab('register')}
                 disabled={loading}
               >
@@ -166,10 +174,10 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
               </button>
             </p>
           ) : (
-            <p>
+            <p className="text-orange-800">
               Already have an account?{' '}
               <button 
-                className="link link-primary" 
+                className="text-orange-600 hover:text-orange-700 font-medium underline" 
                 onClick={() => setActiveTab('login')}
                 disabled={loading}
               >
@@ -181,11 +189,11 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
 
         {/* First User Info */}
         {activeTab === 'register' && (
-          <div className="alert alert-info mt-4">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-current shrink-0 w-6 h-6">
+          <div className="alert bg-amber-100 border-amber-300 mt-4">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-current shrink-0 w-6 h-6 text-amber-600">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
             </svg>
-            <span className="text-xs">First user to register becomes admin! 👑</span>
+            <span className="text-xs text-amber-800">First user to register becomes admin!</span>
           </div>
         )}
       </div>

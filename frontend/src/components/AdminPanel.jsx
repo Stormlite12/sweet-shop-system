@@ -289,9 +289,8 @@ export default function AdminPanel() {
   if (!isAdmin) {
     return (
       <div className="text-center py-12">
-        <div className="text-6xl mb-4">🚫</div>
-        <h2 className="text-3xl font-bold text-neutral mb-4">Admin Access Required</h2>
-        <p className="text-lg text-base-content/70">
+        <h2 className="text-3xl font-bold text-orange-600 mb-4">Admin Access Required</h2>
+        <p className="text-lg text-orange-800/70">
           Please login as an admin to manage sweets.
         </p>
       </div>
@@ -301,71 +300,83 @@ export default function AdminPanel() {
   console.log('🎯 AdminPanel render - sweets count:', sweets.length)
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 bg-gradient-to-b from-orange-50 to-white min-h-screen py-8">
       {/* Header */}
       <div className="text-center">
-        <h2 className="text-3xl font-bold text-neutral mb-4">
+        <h2 className="text-3xl font-bold text-orange-600 mb-4">
           Sweet Shop Management
         </h2>
-        <p className="text-lg text-base-content/70">
+        <p className="text-lg text-orange-800/70">
           Add, edit, and manage your sweet inventory
         </p>
       </div>
 
-      {/* Debug Info (remove this later) */}
-      <div className="alert alert-info">
-        <span>Debug: Found {sweets.length} sweets | Loading: {loading.toString()} | Tab: {activeTab}</span>
-        <button onClick={fetchSweets} className="btn btn-sm">Refresh</button>
+      {/* Debug Info */}
+      <div className="alert bg-amber-100 border-amber-300 max-w-4xl mx-auto">
+        <span className="text-amber-800">Debug: Found {sweets.length} sweets | Loading: {loading.toString()} | Tab: {activeTab}</span>
+        <button onClick={fetchSweets} className="btn btn-sm bg-orange-600 hover:bg-orange-700 text-white border-orange-600">Refresh</button>
       </div>
 
       {/* Tabs */}
-      <div className="tabs tabs-boxed justify-center bg-base-100 shadow-lg max-w-fit mx-auto">
+      <div className="flex bg-white rounded-lg shadow-lg max-w-fit mx-auto border border-orange-200">
         <button 
-          className={`tab tab-lg ${activeTab === 'add' ? 'tab-active' : ''}`}
+          className={`px-6 py-3 rounded-l-lg font-medium transition-colors ${
+            activeTab === 'add' 
+              ? 'bg-orange-600 text-white' 
+              : 'text-orange-700 hover:bg-orange-50'
+          }`}
           onClick={() => setActiveTab('add')}
         >
-          {editingSweet ? '✏️ Edit Sweet' : '➕ Add Sweet'}
+          {editingSweet ? 'Edit Sweet' : 'Add Sweet'}
         </button>
         <button 
-          className={`tab tab-lg ${activeTab === 'view' ? 'tab-active' : ''}`}
+          className={`px-6 py-3 font-medium transition-colors border-l border-orange-200 ${
+            activeTab === 'view' 
+              ? 'bg-orange-600 text-white' 
+              : 'text-orange-700 hover:bg-orange-50'
+          }`}
           onClick={() => {
             setActiveTab('view')
-            fetchSweets() // Force refresh
+            fetchSweets()
           }}
         >
-          👀 View All ({sweets.length})
+          View All ({sweets.length})
         </button>
         <button 
-          className={`tab tab-lg ${activeTab === 'manage' ? 'tab-active' : ''}`}
+          className={`px-6 py-3 rounded-r-lg font-medium transition-colors border-l border-orange-200 ${
+            activeTab === 'manage' 
+              ? 'bg-orange-600 text-white' 
+              : 'text-orange-700 hover:bg-orange-50'
+          }`}
           onClick={() => {
             setActiveTab('manage')
-            fetchSweets() // Force refresh
+            fetchSweets()
           }}
         >
-          ⚙️ Manage
+          Manage
         </button>
       </div>
 
       {/* Add/Edit Sweet Tab */}
       {activeTab === 'add' && (
         <div className="max-w-2xl mx-auto">
-          <div className="card bg-base-100 shadow-xl">
+          <div className="card bg-white shadow-xl border border-orange-200">
             <div className="card-body">
-              <h3 className="card-title text-2xl mb-6">
-                {editingSweet ? '✏️ Edit Sweet' : '➕ Add New Sweet'}
+              <h3 className="card-title text-2xl mb-6 text-orange-600">
+                {editingSweet ? 'Edit Sweet' : 'Add New Sweet'}
               </h3>
               
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Sweet Name */}
                 <div className="form-control w-full">
                   <label className="label">
-                    <span className="label-text text-lg font-semibold">Sweet Name</span>
+                    <span className="label-text text-lg font-semibold text-orange-800">Sweet Name</span>
                   </label>
                   <input
                     type="text"
                     name="name"
                     placeholder="e.g., Gulab Jamun"
-                    className="input input-bordered w-full"
+                    className="input input-bordered border-orange-300 focus:border-orange-500 w-full bg-white text-gray-900 placeholder-gray-500"
                     value={formData.name}
                     onChange={handleChange}
                     required
@@ -375,11 +386,11 @@ export default function AdminPanel() {
                 {/* Category */}
                 <div className="form-control w-full">
                   <label className="label">
-                    <span className="label-text text-lg font-semibold">Category</span>
+                    <span className="label-text text-lg font-semibold text-orange-800">Category</span>
                   </label>
                   <select
                     name="category"
-                    className="select select-bordered w-full"
+                    className="select select-bordered border-orange-300 focus:border-orange-500 w-full bg-white text-gray-900"
                     value={formData.category}
                     onChange={handleChange}
                     required
@@ -397,7 +408,7 @@ export default function AdminPanel() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="form-control">
                     <label className="label">
-                      <span className="label-text text-lg font-semibold">Price (₹)</span>
+                      <span className="label-text text-lg font-semibold text-orange-800">Price (₹)</span>
                     </label>
                     <input
                       type="number"
@@ -405,7 +416,7 @@ export default function AdminPanel() {
                       placeholder="0.00"
                       step="0.01"
                       min="0"
-                      className="input input-bordered"
+                      className="input input-bordered border-orange-300 focus:border-orange-500 bg-white text-gray-900 placeholder-gray-500"
                       value={formData.price}
                       onChange={handleChange}
                       required
@@ -414,14 +425,14 @@ export default function AdminPanel() {
 
                   <div className="form-control">
                     <label className="label">
-                      <span className="label-text text-lg font-semibold">Stock Quantity</span>
+                      <span className="label-text text-lg font-semibold text-orange-800">Stock Quantity</span>
                     </label>
                     <input
                       type="number"
                       name="stock"
                       placeholder="0"
                       min="0"
-                      className="input input-bordered"
+                      className="input input-bordered border-orange-300 focus:border-orange-500 bg-white text-gray-900 placeholder-gray-500"
                       value={formData.stock}
                       onChange={handleChange}
                       required
@@ -432,25 +443,33 @@ export default function AdminPanel() {
                 {/* Image Input with Toggle */}
                 <div className="form-control w-full">
                   <label className="label">
-                    <span className="label-text text-lg font-semibold">Sweet Image</span>
+                    <span className="label-text text-lg font-semibold text-orange-800">Sweet Image</span>
                   </label>
                   
                   {/* Image Input Type Toggle */}
-                  <div className="tabs tabs-boxed mb-4 w-fit">
+                  <div className="flex bg-orange-100 rounded-lg p-1 mb-4 w-fit">
                     <button 
                       type="button"
-                      className={`tab ${imageInputType === 'url' ? 'tab-active' : ''}`}
+                      className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                        imageInputType === 'url' 
+                          ? 'bg-orange-600 text-white shadow-sm' 
+                          : 'text-orange-700 hover:bg-orange-200'
+                      }`}
                       onClick={() => {
                         setImageInputType('url')
                         setImageFile(null)
                         setImagePreview(formData.image || '')
                       }}
                     >
-                      🔗 Image URL
+                      Image URL
                     </button>
                     <button 
                       type="button"
-                      className={`tab ${imageInputType === 'upload' ? 'tab-active' : ''}`}
+                      className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                        imageInputType === 'upload' 
+                          ? 'bg-orange-600 text-white shadow-sm' 
+                          : 'text-orange-700 hover:bg-orange-200'
+                      }`}
                       onClick={() => {
                         setImageInputType('upload')
                         setFormData({...formData, image: ''})
@@ -458,7 +477,7 @@ export default function AdminPanel() {
                       }}
                       title="Requires admin login for file uploads"
                     >
-                      📁 Upload File {!isAdmin && '🔒'}
+                      Upload File {!isAdmin && '(Locked)'}
                     </button>
                   </div>
 
@@ -479,7 +498,7 @@ export default function AdminPanel() {
                         type="url"
                         name="image"
                         placeholder="https://example.com/image.jpg"
-                        className="input input-bordered w-full"
+                        className="input input-bordered border-orange-300 focus:border-orange-500 w-full bg-white text-gray-900 placeholder-gray-500"
                         value={formData.image}
                         onChange={(e) => {
                           handleChange(e)
@@ -487,7 +506,7 @@ export default function AdminPanel() {
                         }}
                       />
                       <div className="label">
-                        <span className="label-text-alt">Enter a direct image URL (JPG, PNG, GIF)</span>
+                        <span className="label-text-alt text-orange-600">Enter a direct image URL (JPG, PNG, GIF)</span>
                       </div>
                     </>
                   )}
@@ -499,10 +518,10 @@ export default function AdminPanel() {
                         type="file"
                         accept="image/*"
                         onChange={handleImageChange}
-                        className="file-input file-input-bordered w-full"
+                        className="file-input file-input-bordered border-orange-300 focus:border-orange-500 w-full bg-white text-gray-900"
                       />
                       <div className="label">
-                        <span className="label-text-alt">Upload from your device (Max 5MB)</span>
+                        <span className="label-text-alt text-orange-600">Upload from your device (Max 5MB)</span>
                       </div>
                     </>
                   )}
@@ -548,7 +567,7 @@ export default function AdminPanel() {
                   {editingSweet && (
                     <button
                       type="button"
-                      className="btn btn-outline"
+                      className="btn btn-outline border-orange-300 text-orange-700 hover:bg-orange-50"
                       onClick={handleCancelEdit}
                     >
                       Cancel
@@ -556,7 +575,7 @@ export default function AdminPanel() {
                   )}
                   <button
                     type="submit"
-                    className={`btn btn-primary ${loading ? 'loading' : ''}`}
+                    className={`btn bg-orange-600 hover:bg-orange-700 text-white border-orange-600 ${loading ? 'loading' : ''}`}
                     disabled={loading}
                   >
                     {loading ? 'Saving...' : editingSweet ? 'Update Sweet' : 'Add Sweet'}
@@ -579,7 +598,8 @@ export default function AdminPanel() {
                   className="btn btn-primary"
                   onClick={() => setActiveTab('add')}
                 >
-                  ➕ Add New Sweet
+                  ➕ Add New Sw
+                  eet
                 </button>
               </div>
 

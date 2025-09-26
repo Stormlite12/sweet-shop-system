@@ -172,28 +172,27 @@ export default function SweetCards({ cart, onOpenCart }) {
               placeholder="Search sweets..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white text-black placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
+              className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
             />
           </div>
 
           {/* Category Filter */}
           <div className="dropdown dropdown-end">
-            <div tabIndex={0} role="button" className="text-black inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-gray-300 bg-white hover:bg-gray-50 h-10 px-4 py-2 min-w-[160px]">
+            <div tabIndex={0} role="button" className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-gray-300 bg-white hover:bg-gray-50 h-10 px-4 py-2 min-w-[160px] text-gray-900">
               {selectedCategory}
               <svg className="w-4 h-4 ml-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
               </svg>
             </div>
-            <ul tabIndex={0} className="dropdown-content z-[1] menu p-1 shadow-lg bg-white rounded-lg border border-gray-200 w-52 mt-2 text-black">
+            <ul tabIndex={0} className="dropdown-content z-[1] menu p-1 shadow-lg bg-white rounded-lg border border-gray-200 w-52 mt-2">
               {categories.map((category) => (
                 <li key={category}>
                   <a 
                     onClick={() => setSelectedCategory(category)} 
-                    className="block px-3 py-2 text-sm text-black hover:bg-orange-50 hover:text-orange-700 rounded transition-colors"
+                    className="block px-3 py-2 text-sm text-gray-900 hover:bg-orange-50 hover:text-orange-700 rounded transition-colors"
                   >
                     {category}
                   </a>
-                  
                 </li>
               ))}
             </ul>
