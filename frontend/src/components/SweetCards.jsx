@@ -213,11 +213,11 @@ export default function SweetCards({ cart, onOpenCart }) {
                 {/* Sweet Image */}
                 <div className="aspect-[4/3] overflow-hidden">
                   <img
-                    src={sweet.image || "/placeholder.jpg"}
+                    src={sweet.image || "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=400&h=300&fit=crop"}
                     alt={sweet.name || "Sweet"}
                     className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 ${isOutOfStock ? 'grayscale opacity-50' : ''}`}
                     onError={(e) => {
-                      e.target.src = "/src/assets/placeholder.jpg"
+                      e.target.src = "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=400&h=300&fit=crop"
                     }}
                   />
                   

@@ -43,21 +43,13 @@ const sweetSchema = new mongoose.Schema({
   image: {
     type: String,
     default: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=400&h=300&fit=crop',
-    maxlength: [2000000, 'Image data too large (max 2MB Base64)'], // Reduced limit
     validate: {
       validator: function(v) {
-        // Allow URLs or Base64 data URLs
+        // Allow URLs only (removed Base64 validation)
         if (!v) return true;
-        if (v.startsWith('http')) return true;
-        if (v.startsWith('data:image/')) {
-          // Check Base64 size (rough estimate)
-          const base64Data = v.split(',')[1] || '';
-          const sizeInBytes = (base64Data.length * 3) / 4;
-          return sizeInBytes <= 2 * 1024 * 1024; // 2MB limit
-        }
-        return false;
+        return v.startsWith('http');
       },
-      message: 'Image must be a valid URL or Base64 data URL (max 2MB)'
+      message: 'Image must be a valid URL'
     }
   },
   

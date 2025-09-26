@@ -460,11 +460,11 @@ export default function AdminPanel() {
                     <div key={sweet._id} className="card bg-base-200 shadow-md">
                       <figure className="px-4 pt-4">
                         <img
-                          src={sweet.image || '/placeholder.jpg'}
+                          src={sweet.image || "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=400&h=300&fit=crop"}
                           alt={sweet.name}
                           className="rounded-xl w-full h-48 object-cover"
                           onError={(e) => {
-                            e.target.src = '/placeholder.jpg'
+                            e.target.src = "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=400&h=300&fit=crop"
                           }}
                         />
                       </figure>
@@ -533,10 +533,10 @@ export default function AdminPanel() {
                               <div className="avatar">
                                 <div className="mask mask-squircle w-12 h-12">
                                   <img
-                                    src={sweet.image || '/placeholder.jpg'}
+                                    src={sweet.image || "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=400&h=300&fit=crop"}
                                     alt={sweet.name}
                                     onError={(e) => {
-                                      e.target.src = '/placeholder.jpg'
+                                      e.target.src = "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=400&h=300&fit=crop"
                                     }}
                                   />
                                 </div>

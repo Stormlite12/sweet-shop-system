@@ -297,8 +297,7 @@ Restock sweet inventory
 }
 ```
 
-#### `POST /api/sweets/upload` 🔒 Admin Only
-Upload sweet image (multipart form data with `image` field)
+**Note**: Upload functionality has been removed in favor of URL-based images for better reliability and deployment compatibility.
 
 ## 🏗️ Component Architecture
 
@@ -621,4 +620,4 @@ npm test
 
 *Developed with AI assistance for accelerated development and best practices*
 
-*Last updated: December 2024**
+*Last updated: December 2024*

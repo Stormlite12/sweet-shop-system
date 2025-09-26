@@ -197,11 +197,11 @@ export default function CartSidebar({ isOpen, onClose, cart, onOpenAuth }) {
                   return (
                     <div key={sweet._id} className="flex space-x-3 p-4 bg-orange-50/50 rounded-lg border border-orange-100 hover:bg-orange-50/70 transition-colors">
                       <img
-                        src={sweet.image || "/placeholder.jpg"}
+                        src={sweet.image || "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=400&h=300&fit=crop"}
                         alt={sweet.name}
                         className="w-16 h-16 object-cover rounded-lg border border-orange-200 flex-shrink-0"
                         onError={(e) => {
-                          e.target.src = "/placeholder.jpg"
+                          e.target.src = "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=400&h=300&fit=crop"
                         }}
                       />
                       
