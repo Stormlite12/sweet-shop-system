@@ -19,9 +19,7 @@ export default function AdminPanel() {
     image: ''
   })
   
-  const [imageFile, setImageFile] = useState(null)
   const [imagePreview, setImagePreview] = useState('')
-  const [imageInputType, setImageInputType] = useState('url') // 'url' or 'upload'
 
   // Check if user is admin
   const isAdmin = authService.isAdmin()
@@ -81,82 +79,7 @@ export default function AdminPanel() {
     })
   }
 
-  // Handle image file selection
-  const handleImageChange = (e) => {
-    const file = e.target.files[0]
-    if (file) {
-      setImageFile(file)
-      
-      // Create preview URL
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setImagePreview(reader.result)
-      }
-      reader.readAsDataURL(file)
-      
-      // Clear URL input when file is selected
-      setFormData({...formData, image: ''})
-    } else {
-      setImageFile(null)
-      setImagePreview('')
-    }
-  }
-
-  // Upload image to server
-  const uploadImage = async (file) => {
-    const formDataUpload = new FormData()
-    formDataUpload.append('image', file)
-    
-    try {
-      console.log('📤 Uploading file:', file.name);
-      
-      // Get the token for authentication
-      const token = localStorage.getItem('token')
-      if (!token) {
-        throw new Error('Please login as admin to upload images')
-      }
-      
-      const response = await fetch(API_ENDPOINTS.upload, { // Use config instead of hardcoded URL
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}` // Add auth token
-        },
-        body: formDataUpload,
-      })
-      
-      if (response.status === 401) {
-        throw new Error('Admin login required to upload images')
-      }
-      
-      if (response.status === 403) {
-        throw new Error('Admin privileges required to upload images')
-      }
-      
-      if (!response.ok) {
-        const errorData = await response.text();
-        throw new Error(`Upload failed: ${response.status} - ${errorData}`);
-      }
-      
-      const data = await response.json()
-      console.log('✅ Upload successful:', data);
-      return data.imageUrl
-    } catch (error) {
-      console.error('❌ Image upload error:', error)
-      
-      // Show specific error messages
-      if (error.message.includes('401') || error.message.includes('Admin login')) {
-        toast.error('Please login as admin to upload images')
-      } else if (error.message.includes('403') || error.message.includes('privileges')) {
-        toast.error('Admin privileges required for image uploads')
-      } else {
-        toast.error('Image upload failed: ' + error.message)
-      }
-      
-      throw error
-    }
-  }
-
-  // Handle form submission (Add or Update)
+  // Handle form submission with simplified image handling
   const handleSubmit = async (e) => {
     e.preventDefault()
     setLoading(true)
@@ -168,29 +91,8 @@ export default function AdminPanel() {
       const priceValue = parseFloat(formData.price);
       const finalPrice = isNaN(priceValue) ? 0 : priceValue;
 
-      let imageUrl = 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=400&h=300&fit=crop'
-
-      // Handle image - either upload file or use URL
-      if (imageInputType === 'upload' && imageFile) {
-        try {
-          const uploadedUrl = await uploadImage(imageFile)
-          imageUrl = uploadedUrl // Use the full URL returned from server
-          toast.success('Image uploaded successfully!')
-          console.log('📤 Using uploaded image URL:', imageUrl)
-        } catch (error) {
-          // If upload fails, offer to use URL instead or default image
-          if (error.message.includes('Admin') || error.message.includes('401') || error.message.includes('403')) {
-            toast.error('Upload failed - using default image instead')
-            imageUrl = 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=400&h=300&fit=crop'
-          } else {
-            toast.error('Failed to upload image: ' + error.message)
-            setLoading(false)
-            return
-          }
-        }
-      } else if (imageInputType === 'url' && formData.image.trim()) {
-        imageUrl = formData.image.trim()
-      }
+      // Use URL or default image
+      const imageUrl = formData.image.trim() || 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=400&h=300&fit=crop'
 
       const sweetData = {
         name: formData.name.trim(),
@@ -219,7 +121,6 @@ export default function AdminPanel() {
         category: '',
         image: ''
       })
-      setImageFile(null)
       setImagePreview('')
 
       // Refresh sweets list
@@ -247,9 +148,7 @@ export default function AdminPanel() {
       image: sweet.image || ''
     })
     setEditingSweet(sweet)
-    setImageFile(null)
     setImagePreview(sweet.image || '')
-    setImageInputType('url') // Default to URL when editing
     setActiveTab('add')
   }
 
@@ -263,7 +162,6 @@ export default function AdminPanel() {
       category: '',
       image: ''
     })
-    setImageFile(null)
     setImagePreview('')
   }
 
@@ -440,91 +338,29 @@ export default function AdminPanel() {
                   </div>
                 </div>
 
-                {/* Image Input with Toggle */}
+                {/* Image Input - URL Only */}
                 <div className="form-control w-full">
                   <label className="label">
                     <span className="label-text text-lg font-semibold text-orange-800">Sweet Image</span>
                   </label>
                   
-                  {/* Image Input Type Toggle */}
-                  <div className="flex bg-orange-100 rounded-lg p-1 mb-4 w-fit">
-                    <button 
-                      type="button"
-                      className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                        imageInputType === 'url' 
-                          ? 'bg-orange-600 text-white shadow-sm' 
-                          : 'text-orange-700 hover:bg-orange-200'
-                      }`}
-                      onClick={() => {
-                        setImageInputType('url')
-                        setImageFile(null)
-                        setImagePreview(formData.image || '')
-                      }}
-                    >
-                      Image URL
-                    </button>
-                    <button 
-                      type="button"
-                      className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                        imageInputType === 'upload' 
-                          ? 'bg-orange-600 text-white shadow-sm' 
-                          : 'text-orange-700 hover:bg-orange-200'
-                      }`}
-                      onClick={() => {
-                        setImageInputType('upload')
-                        setFormData({...formData, image: ''})
-                        setImagePreview(imageFile ? URL.createObjectURL(imageFile) : '')
-                      }}
-                      title="Requires admin login for file uploads"
-                    >
-                      Upload File {!isAdmin && '(Locked)'}
-                    </button>
+                  <input
+                    type="url"
+                    name="image"
+                    placeholder="https://example.com/image.jpg"
+                    className="input input-bordered border-orange-300 focus:border-orange-500 w-full bg-white text-gray-900 placeholder-gray-500"
+                    value={formData.image}
+                    onChange={(e) => {
+                      handleChange(e)
+                      setImagePreview(e.target.value)
+                    }}
+                  />
+                  <div className="label">
+                    <span className="label-text-alt text-orange-600">Enter a direct image URL (JPG, PNG, GIF)</span>
                   </div>
-
-                  {/* Show admin requirement notice for uploads */}
-                  {imageInputType === 'upload' && !isAdmin && (
-                    <div className="alert alert-warning mb-4">
-                      <svg className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.996-.833-2.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                      </svg>
-                      <span>Admin login required for file uploads. Please use Image URL instead.</span>
-                    </div>
-                  )}
-
-                  {/* URL Input */}
-                  {imageInputType === 'url' && (
-                    <>
-                      <input
-                        type="url"
-                        name="image"
-                        placeholder="https://example.com/image.jpg"
-                        className="input input-bordered border-orange-300 focus:border-orange-500 w-full bg-white text-gray-900 placeholder-gray-500"
-                        value={formData.image}
-                        onChange={(e) => {
-                          handleChange(e)
-                          setImagePreview(e.target.value)
-                        }}
-                      />
-                      <div className="label">
-                        <span className="label-text-alt text-orange-600">Enter a direct image URL (JPG, PNG, GIF)</span>
-                      </div>
-                    </>
-                  )}
-
-                  {/* File Upload */}
-                  {imageInputType === 'upload' && (
-                    <>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleImageChange}
-                        className="file-input file-input-bordered border-orange-300 focus:border-orange-500 w-full bg-white text-gray-900"
-                      />
-                      <div className="label">
-                        <span className="label-text-alt text-orange-600">Upload from your device (Max 5MB)</span>
-                      </div>
-                    </>
-                  )}
+                  <div className="label">
+                    <span className="label-text-alt text-amber-600">💡 Leave empty to use default sweet image</span>
+                  </div>
 
                   {/* Image Preview */}
                   {imagePreview && (
@@ -536,7 +372,7 @@ export default function AdminPanel() {
                         <img 
                           src={imagePreview} 
                           alt="Preview" 
-                          className="w-48 h-48 object-cover rounded-lg border-2 border-base-300"
+                          className="w-48 h-48 object-cover rounded-lg border-2 border-orange-200"
                           onError={(e) => {
                             e.target.src = 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=400&h=300&fit=crop'
                           }}
@@ -545,13 +381,9 @@ export default function AdminPanel() {
                       <div className="text-center mt-2">
                         <button
                           type="button"
-                          className="btn btn-sm btn-outline btn-error"
+                          className="btn btn-sm bg-orange-100 hover:bg-orange-200 text-orange-700 border-orange-300"
                           onClick={() => {
-                            if (imageInputType === 'url') {
-                              setFormData({...formData, image: ''})
-                            } else {
-                              setImageFile(null)
-                            }
+                            setFormData({...formData, image: ''})
                             setImagePreview('')
                           }}
                         >

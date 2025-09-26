@@ -1,39 +1,78 @@
 // backend/src/models/Sweet.js
 import mongoose from 'mongoose';
 
-const SweetSchema = new mongoose.Schema({
+const sweetSchema = new mongoose.Schema({
   name: {
     type: String,
     required: [true, 'Sweet name is required'],
-    trim: true
+    trim: true,
+    maxlength: [100, 'Name cannot exceed 100 characters']
   },
+  
   category: {
     type: String,
     required: [true, 'Category is required'],
-    trim: true
+    enum: {
+      values: ['milk-based', 'sugar-based', 'dry-fruits', 'festival', 'snacks'],
+      message: 'Please select a valid category'
+    }
   },
+  
   price: {
     type: Number,
     required: [true, 'Price is required'],
-    min: [0, 'Price must be positive']
+    min: [0, 'Price cannot be negative'],
+    validate: {
+      validator: function(v) {
+        return v >= 0 && Number.isFinite(v);
+      },
+      message: 'Price must be a valid positive number'
+    }
   },
-  stock: {  // Changed from 'quantity' to 'stock' to match frontend
+  
+  stock: {
     type: Number,
-    required: [true, 'Stock is required'],
-    min: [0, 'Stock cannot be negative']
+    required: [true, 'Stock quantity is required'],
+    min: [0, 'Stock cannot be negative'],
+    validate: {
+      validator: Number.isInteger,
+      message: 'Stock must be a whole number'
+    }
   },
+  
   image: {
     type: String,
-    default: '/placeholder.jpg' // Default placeholder image
+    default: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=400&h=300&fit=crop',
+    maxlength: [2000000, 'Image data too large (max 2MB Base64)'], // Reduced limit
+    validate: {
+      validator: function(v) {
+        // Allow URLs or Base64 data URLs
+        if (!v) return true;
+        if (v.startsWith('http')) return true;
+        if (v.startsWith('data:image/')) {
+          // Check Base64 size (rough estimate)
+          const base64Data = v.split(',')[1] || '';
+          const sizeInBytes = (base64Data.length * 3) / 4;
+          return sizeInBytes <= 2 * 1024 * 1024; // 2MB limit
+        }
+        return false;
+      },
+      message: 'Image must be a valid URL or Base64 data URL (max 2MB)'
+    }
   },
-  isActive: {
-    type: Boolean,
-    default: true // To enable/disable sweets without deleting
+  
+  description: {
+    type: String,
+    maxlength: [500, 'Description cannot exceed 500 characters'],
+    default: 'Delicious handcrafted sweet made with premium ingredients'
   }
 }, {
-  timestamps: true // Adds createdAt and updatedAt automatically
+  timestamps: true
 });
 
-const Sweet = mongoose.model('Sweet', SweetSchema);
+// Add index for better query performance
+sweetSchema.index({ category: 1 });
+sweetSchema.index({ name: 1 });
+sweetSchema.index({ price: 1 });
 
-export default Sweet;
+export default mongoose.model('Sweet', sweetSchema);

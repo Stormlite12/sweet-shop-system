@@ -1,68 +1,5 @@
 import Sweet from '../models/Sweet.js';
 import mongoose from 'mongoose';
-import multer from 'multer';
-import path from 'path';
-import fs from 'fs';
-
-// Ensure uploads directory exists
-const uploadsDir = path.join(process.cwd(), 'uploads');
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
-  console.log('📁 Created uploads directory:', uploadsDir);
-}
-
-// Configure multer for image uploads
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'uploads/')
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
-    cb(null, 'sweet-' + uniqueSuffix + path.extname(file.originalname))
-  }
-})
-
-export const upload = multer({ 
-  storage: storage,
-  limits: {
-    fileSize: 5 * 1024 * 1024 // 5MB limit
-  },
-  fileFilter: (req, file, cb) => {
-    if (file.mimetype.startsWith('image/')) {
-      cb(null, true)
-    } else {
-      cb(new Error('Only image files are allowed!'), false)
-    }
-  }
-})
-
-// POST /api/sweets/upload - Upload image
-export const uploadImage = (req, res) => {
-  try {
-    console.log('📤 Upload request received');
-    console.log('📤 File details:', req.file);
-    
-    if (!req.file) {
-      return res.status(400).json({ message: 'No image file provided' })
-    }
-
-    // Generate dynamic URL based on the request
-    const protocol = req.secure || req.get('x-forwarded-proto') === 'https' ? 'https' : 'http'
-    const host = req.get('host')
-    const imageUrl = `${protocol}://${host}/uploads/${req.file.filename}`
-    
-    console.log('✅ Image uploaded successfully:', imageUrl);
-    
-    res.status(200).json({ 
-      imageUrl,
-      message: 'Image uploaded successfully',
-      filename: req.file.filename
-    })
-  } catch (error) {
-    console.error('❌ Image upload error:', error)
-    res.status(500).json({ message: 'Failed to upload image: ' + error.message })
-  }
-}
 
 // GET /api/sweets - Get all sweets
 export const getAllSweets = async (req, res) => {
@@ -76,7 +13,7 @@ export const getAllSweets = async (req, res) => {
   }
 };
 
-// POST /api/sweets - Create new sweet
+// POST /api/sweets - Create new sweet (simplified)
 export const createSweet = async (req, res) => {
   try {
     const { name, category, price, stock, image } = req.body;
@@ -86,7 +23,7 @@ export const createSweet = async (req, res) => {
       category,
       price: parseFloat(price),
       stock: parseInt(stock),
-      image: image || 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=400&h=300&fit=crop' // Default image
+      image: image || 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=400&h=300&fit=crop'
     });
 
     const savedSweet = await sweet.save();
@@ -94,7 +31,15 @@ export const createSweet = async (req, res) => {
     res.status(201).json(savedSweet);
   } catch (error) {
     console.error('❌ Error creating sweet:', error);
-    res.status(400).json({ message: error.message });
+    
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({ 
+        message: 'Validation error',
+        errors: Object.values(error.errors).map(err => err.message)
+      });
+    }
+    
+    res.status(400).json({ message: error.message || 'Failed to create sweet' });
   }
 };
 

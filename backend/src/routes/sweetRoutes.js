@@ -7,9 +7,7 @@ import {
   updateSweet,
   deleteSweet,
   purchaseSweet,
-  restockSweet,
-  upload,
-  uploadImage
+  restockSweet
 } from '../controllers/sweetController.js';
 import { authenticateToken } from '../middleware/auth.js';
 import { requireAdmin } from '../middleware/admin.js';
@@ -17,12 +15,9 @@ import { requireAdmin } from '../middleware/admin.js';
 const router = express.Router();
 
 // Public routes (NO authentication required for viewing)
-router.get('/', getAllSweets);  // Remove authenticateToken
-router.get('/search', searchSweets);  // Remove authenticateToken  
-router.get('/:id', getSweetById);  // Remove authenticateToken
-
-// Image upload route (admin only)
-router.post('/upload', authenticateToken, requireAdmin, upload.single('image'), uploadImage);
+router.get('/', getAllSweets);
+router.get('/search', searchSweets);
+router.get('/:id', getSweetById);
 
 // Purchase requires authentication
 router.post('/:id/purchase', authenticateToken, purchaseSweet);

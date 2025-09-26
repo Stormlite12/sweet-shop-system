@@ -3,7 +3,7 @@
 const getApiBaseUrl = () => {
   // Check if we're in development or production
   if (import.meta.env.DEV) {
-    // Development - use localhost:5000 (NOT 8080!)
+    // Development - use localhost:5000
     return 'http://localhost:5000'
   } else {
     // Production - use Railway URL
@@ -14,9 +14,8 @@ const getApiBaseUrl = () => {
 export const API_BASE_URL = getApiBaseUrl()
 export const API_ENDPOINTS = {
   sweets: `${API_BASE_URL}/api/sweets`,
-  auth: `${API_BASE_URL}/api/auth`, 
-  upload: `${API_BASE_URL}/api/sweets/upload`,
-  uploads: `${API_BASE_URL}/uploads`
+  auth: `${API_BASE_URL}/api/auth`
+  // Removed upload endpoint
 }
 
 // Debug logging with more info
@@ -25,5 +24,7 @@ console.log('🔧 API Configuration:', {
   mode: import.meta.env.MODE,
   baseUrl: API_BASE_URL,
   endpoints: API_ENDPOINTS,
-  origin: window.location.origin
+  origin: window.location.origin,
+  imageStorage: 'url-only'
 })
+
