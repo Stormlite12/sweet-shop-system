@@ -1,7 +1,7 @@
 // src/components/Navbar.jsx
 import { useState, useEffect } from 'react'
+import { authService } from '../services/authService.jsx'
 import { Link, useNavigate } from 'react-router-dom'
-import { authService } from '../services/authService'
 import logo from "/misthi-mahal-logo.png"
 import toast from 'react-hot-toast'
 

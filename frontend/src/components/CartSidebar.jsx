@@ -1,11 +1,26 @@
 import { useState, useEffect } from 'react'
-import { sweetService } from '../services/sweetService'
+import { sweetService } from '../services/sweetService.jsx'
+import { authService } from '../services/authService.jsx'
 import toast from 'react-hot-toast'
 
-export default function CartSidebar({ isOpen, onClose, cart }) {
+export default function CartSidebar({ isOpen, onClose, cart, onOpenAuth }) {
   const [sweets, setSweets] = useState([])
   const [loading, setLoading] = useState(false)
   const [purchasing, setPurchasing] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+
+  // Check authentication status
+  useEffect(() => {
+    const checkAuth = () => {
+      setIsAuthenticated(authService.isAuthenticated())
+    }
+    
+    checkAuth()
+    
+    // Listen for auth changes
+    window.addEventListener('authChange', checkAuth)
+    return () => window.removeEventListener('authChange', checkAuth)
+  }, [])
 
   useEffect(() => {
     if (isOpen) {
@@ -44,6 +59,13 @@ export default function CartSidebar({ isOpen, onClose, cart }) {
   }
 
   const handlePurchase = async () => {
+    // Check if user is authenticated first
+    if (!isAuthenticated) {
+      toast.error('Please login to complete your purchase')
+      onOpenAuth() // Open auth modal
+      return
+    }
+
     try {
       setPurchasing(true)
 
@@ -273,33 +295,47 @@ export default function CartSidebar({ isOpen, onClose, cart }) {
                 </div>
               </div>
 
-              {/* Purchase Button */}
-              <button
-                onClick={handlePurchase}
-                disabled={purchasing || sweets.length === 0}
-                onKeyDown={(e) => e.key === 'Enter' && handlePurchase()}
-                className="w-full bg-orange-600 hover:bg-orange-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2 focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 mb-2"
-              >
-                {purchasing ? (
-                  <>
-                    <svg className="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    <span>Processing Purchase...</span>
-                  </>
-                ) : (
-                  <>
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 9M7 13l-1.5-9" />
-                    </svg>
-                    <span>Complete Purchase</span>
-                  </>
-                )}
-              </button>
+              {/* Purchase Button - Show different states based on auth */}
+              {!isAuthenticated ? (
+                <button
+                  onClick={handlePurchase}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 mb-2"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                  <span>Login to Complete Purchase</span>
+                </button>
+              ) : (
+                <button
+                  onClick={handlePurchase}
+                  disabled={purchasing || sweets.length === 0}
+                  className="w-full bg-orange-600 hover:bg-orange-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2 focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 mb-2"
+                >
+                  {purchasing ? (
+                    <>
+                      <svg className="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      <span>Processing Purchase...</span>
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 9M7 13l-1.5-9" />
+                      </svg>
+                      <span>Complete Purchase</span>
+                    </>
+                  )}
+                </button>
+              )}
 
               <p className="text-xs text-gray-600 text-center mb-20">
-                🔒 Secure checkout • Stock updated in real-time
+                {isAuthenticated 
+                  ? '🔒 Secure checkout • Stock updated in real-time'
+                  : '🔐 Login required for secure checkout'
+                }
               </p>
             </div>
           )}

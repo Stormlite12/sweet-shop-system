@@ -1,6 +1,6 @@
 // src/components/SweetCards.jsx
 import { useState, useEffect } from 'react'
-import { sweetService } from '../services/sweetService'
+import { sweetService } from '../services/sweetService.jsx'
 import toast from 'react-hot-toast'
 
 export default function SweetCards({ cart, onOpenCart }) {

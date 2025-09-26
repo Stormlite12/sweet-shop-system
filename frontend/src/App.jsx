@@ -4,10 +4,11 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import Home from './pages/home'
 import AdminPanel from './components/AdminPanel'
+import AdminRoute from './components/AdminRoute' 
 import AuthModal from './components/AuthModal'
 import CartSidebar from './components/CartSidebar'
 import { Toaster } from 'react-hot-toast'
-import { useCart } from './hooks/useCart'
+import { useCart } from './hooks/useCart.jsx'
 import './App.css'
 
 function App() {
@@ -24,24 +25,28 @@ function App() {
 
   return (
     <Router>
-      <div className="min-h-screen bg-gradient-to-b from-orange-50 to-white" data-theme="sweetshop">
+      <div className="min-h-screen bg-gray-50">
+        <Toaster position="top-right" />
+        
         <Navbar 
-          onOpenAuth={() => setShowAuthModal(true)}
+          onOpenAuth={() => setShowAuthModal(true)} 
           onOpenCart={() => setShowCartSidebar(true)}
           cartCount={cart.getTotalItems()}
         />
-        
+
         <Routes>
-          <Route 
-            path="/" 
-            element={
-              <Home 
-                cart={cart} 
-                onOpenCart={() => setShowCartSidebar(true)}
-              />
-            } 
-          />
-          <Route path="/admin" element={<AdminPanel />} />
+          <Route path="/" element={
+            <Home 
+              cart={cart} 
+              onOpenCart={() => setShowCartSidebar(true)}
+              onOpenAuth={() => setShowAuthModal(true)}
+            />
+          } />
+          <Route path="/admin" element={
+            <AdminRoute>
+              <AdminPanel />
+            </AdminRoute>
+          } />
         </Routes>
 
         <AuthModal 
@@ -50,10 +55,14 @@ function App() {
           onSuccess={handleAuthSuccess}
         />
 
-        <CartSidebar
-          isOpen={showCartSidebar}
-          onClose={() => setShowCartSidebar(false)}
+        <CartSidebar 
+          isOpen={showCartSidebar} 
+          onClose={() => setShowCartSidebar(false)} 
           cart={cart}
+          onOpenAuth={() => {
+            setShowCartSidebar(false) // Close cart first
+            setShowAuthModal(true)     // Then open auth modal
+          }}
         />
 
         <Toaster 

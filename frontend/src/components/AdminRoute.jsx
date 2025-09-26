@@ -1,5 +1,5 @@
 // src/components/AdminRoute.jsx
-import { authService } from '../services/authService'
+import { authService } from '../services/authService.jsx'
 
 export default function AdminRoute({ children }) {
   const isAdmin = authService.isAdmin()

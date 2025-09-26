@@ -1,9 +1,9 @@
 // src/components/AdminPanel.jsx
 import { useState, useEffect } from 'react'
-import { sweetService } from '../services/sweetService'
-import { authService } from '../services/authService'
+import { sweetService } from '../services/sweetService.jsx'
+import { authService } from '../services/authService.jsx'
 import toast from 'react-hot-toast'
-import { API_ENDPOINTS } from '../config/api'
+import { API_ENDPOINTS } from '../config/api.jsx'
 
 export default function AdminPanel() {
   const [sweets, setSweets] = useState([])

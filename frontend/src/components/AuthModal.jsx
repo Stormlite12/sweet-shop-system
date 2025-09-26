@@ -23,19 +23,29 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
     setLoading(true)
 
     try {
+      console.log('🔐 Attempting authentication...', { activeTab, email: formData.email })
+      
       if (activeTab === 'login') {
         const result = await authService.login(formData.email, formData.password)
+        console.log('✅ Login successful:', result)
         toast.success(`Welcome back! ${result.user.role === 'admin' ? '👑 Admin' : '🍭'}`)
       } else {
         const result = await authService.register(formData.email, formData.password)
+        console.log('✅ Registration successful:', result)
         toast.success(`Welcome to Sweet Shop! ${result.user.role === 'admin' ? '🎉 You are the first admin!' : '🍭'}`)
       }
       
       // Reset form and close modal
       setFormData({ email: '', password: '' })
+      
+      // Trigger auth change event
+      window.dispatchEvent(new Event('authChange'))
+      
       onSuccess?.()
+      onClose()
     } catch (error) {
-      toast.error(error.message)
+      console.error('❌ Authentication failed:', error)
+      toast.error(error.message || 'Authentication failed')
     } finally {
       setLoading(false)
     }
