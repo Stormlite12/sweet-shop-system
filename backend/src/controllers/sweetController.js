@@ -22,7 +22,7 @@ export const createSweet = async (req, res) => {
       category,
       price,
       stock,
-      image: image || '/src/assets/placeholder.jpg' // ✅ Default image
+      image: image || '/placeholder.jpg' // ✅ Default image
     });
 
     const savedSweet = await sweet.save();

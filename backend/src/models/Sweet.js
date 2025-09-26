@@ -24,7 +24,7 @@ const SweetSchema = new mongoose.Schema({
   },
   image: {
     type: String,
-    default: '/src/assets/placeholder.jpg' // Default placeholder image
+    default: '/placeholder.jpg' // Default placeholder image
   },
   isActive: {
     type: Boolean,
