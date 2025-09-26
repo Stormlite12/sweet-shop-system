@@ -35,7 +35,7 @@ export default function HeroSlider() {
 
   return (
     <section className="relative w-full overflow-hidden flex items-center justify-center py-16 bg-gradient-to-b from-orange-50 to-white">
-      <div className="relative w-full h-[80vh] max-w-5xl mx-auto overflow-hidden rounded-lg shadow-2xl border border-orange-200/40">
+      <div className="relative w-full h-[80vh] max-w-5xl mx-auto overflow-hidden rounded-lg shadow-2xl border border-orange-200/40 touch-pan-y">
         
         <ReactCompareSlider
           itemOne={
