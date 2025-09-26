@@ -39,21 +39,19 @@ export default function HeroSlider() {
         
         <ReactCompareSlider
           itemOne={
-    <ReactCompareSliderImage
-      src={currentSlide.before.src || "/api/placeholder/800/600"}
-      alt={currentSlide.before.alt}
-      // Change this back to 'cover'
-      style={{ objectFit: "cover" }}
-    />
-  }
-  itemTwo={
-    <ReactCompareSliderImage
-      src={currentSlide.after.src || "/api/placeholder/800/600"}
-      alt={currentSlide.after.alt}
-      // Change this back to 'cover'
-      style={{ objectFit: "cover" }}
-    />
-  }
+            <ReactCompareSliderImage
+              src={currentSlide.before.src || "/api/placeholder/800/600"}
+              alt={currentSlide.before.alt}
+              style={{ objectFit: "cover" }}
+            />
+          }
+          itemTwo={
+            <ReactCompareSliderImage
+              src={currentSlide.after.src || "/api/placeholder/800/600"}
+              alt={currentSlide.after.alt}
+              style={{ objectFit: "cover" }}
+            />
+          }
           position={sliderPosition}
           onPositionChange={setSliderPosition}
           className="w-full h-full"
@@ -70,6 +68,7 @@ export default function HeroSlider() {
           }
           boundsPadding={0}
           changePositionOnHover={false}
+          onlyHandleDraggable={true}
         />
 
         {/* Text Overlay */}
