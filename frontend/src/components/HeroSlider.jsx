@@ -1,5 +1,5 @@
 // src/components/HeroSlider.jsx
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ReactCompareSlider, ReactCompareSliderImage } from "react-compare-slider";
 
 const slides = [
@@ -20,56 +20,68 @@ const slides = [
 export default function HeroSlider() {
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [sliderPosition, setSliderPosition] = useState(50);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const currentSlide = slides[currentSlideIndex];
 
-  const nextSlide = () => {
-    setCurrentSlideIndex((prev) => (prev + 1) % slides.length);
-    setSliderPosition(50);
-  };
-
-  const prevSlide = () => {
-    setCurrentSlideIndex((prev) => (prev - 1 + slides.length) % slides.length);
-    setSliderPosition(50);
-  };
-
   return (
     <section className="relative w-full overflow-hidden flex items-center justify-center py-16 bg-gradient-to-b from-orange-50 to-white">
-      <div className="relative w-full h-[80vh] max-w-5xl mx-auto overflow-hidden rounded-lg shadow-2xl border border-orange-200/40 touch-pan-y">
+      <div className="relative w-full h-[80vh] max-w-5xl mx-auto overflow-hidden rounded-lg shadow-2xl border border-orange-200/40">
         
-        <ReactCompareSlider
-          itemOne={
-            <ReactCompareSliderImage
-              src={currentSlide.before.src || "/api/placeholder/800/600"}
-              alt={currentSlide.before.alt}
-              style={{ objectFit: "cover" }}
-            />
-          }
-          itemTwo={
-            <ReactCompareSliderImage
+        {isMobile ? (
+          // Mobile View: Simple Image
+          <div className="w-full h-full">
+            <img
               src={currentSlide.after.src || "/api/placeholder/800/600"}
               alt={currentSlide.after.alt}
-              style={{ objectFit: "cover" }}
+              className="w-full h-full object-cover"
             />
-          }
-          position={sliderPosition}
-          onPositionChange={setSliderPosition}
-          className="w-full h-full"
-          style={{
-            '--react-compare-slider-handle-color': '#f97316',
-            '--react-compare-slider-handle-size': '12px',
-          }}
-          handle={
-            <div className="flex items-center justify-center w-12 h-12 bg-white rounded-full shadow-lg border-4 border-orange-200 cursor-grab active:cursor-grabbing hover:border-orange-300 transition-colors">
-              <svg className="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
-              </svg>
-            </div>
-          }
-          boundsPadding={0}
-          changePositionOnHover={false}
-          onlyHandleDraggable={true}
-        />
+          </div>
+        ) : (
+          // Desktop View: Compare Slider
+          <ReactCompareSlider
+            itemOne={
+              <ReactCompareSliderImage
+                src={currentSlide.before.src || "/api/placeholder/800/600"}
+                alt={currentSlide.before.alt}
+                style={{ objectFit: "cover" }}
+              />
+            }
+            itemTwo={
+              <ReactCompareSliderImage
+                src={currentSlide.after.src || "/api/placeholder/800/600"}
+                alt={currentSlide.after.alt}
+                style={{ objectFit: "cover" }}
+              />
+            }
+            position={sliderPosition}
+            onPositionChange={setSliderPosition}
+            className="w-full h-full"
+            style={{
+              '--react-compare-slider-handle-color': '#f97316',
+              '--react-compare-slider-handle-size': '12px',
+            }}
+            handle={
+              <div className="flex items-center justify-center w-12 h-12 bg-white rounded-full shadow-lg border-4 border-orange-200 cursor-grab active:cursor-grabbing hover:border-orange-300 transition-colors">
+                <svg className="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                </svg>
+              </div>
+            }
+            boundsPadding={0}
+            changePositionOnHover={false}
+            onlyHandleDraggable={true}
+          />
+        )}
 
         {/* Text Overlay */}
         <div className="absolute inset-0 flex flex-col items-center justify-center z-30 p-8 pointer-events-none">
