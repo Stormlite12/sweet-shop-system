@@ -1,4 +1,5 @@
 # 🍭 Sweet Shop - Full Stack E-Commerce Application
+# https://sweet-shop-system.vercel.app
 
 A modern, full-featured e-commerce application for a traditional Indian sweet shop, built with the MERN stack and featuring authentication, cart management, and admin functionality.
 
